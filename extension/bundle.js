@@ -84,8 +84,8 @@ export function patchData(data){
   }
   return output;
 }
-export async function buildPatch(bytes){
-  if(bytes.length!==supported.coreSize||await sha256(bytes)!==supported.coreHash)throw Error('Unsupported official core bundle');
+export async function buildPatch(bytes,profile=supported){
+  if(bytes.length!==profile.coreSize||await sha256(bytes)!==profile.coreHash)throw Error('Unsupported official core bundle');
   const bundle=unpack(bytes);bundle.data=patchData(bundle.data);return pack(bundle);
 }
 export function base64(bytes){let result='';for(let i=0;i<bytes.length;i+=8192)result+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(result);}

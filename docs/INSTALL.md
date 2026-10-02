@@ -50,6 +50,8 @@ Native effects loaded. Debugging disconnected.
 
 The toolbar badge should show **ON**. A “Temporary hook installed” message is only an intermediate state.
 
+The first load can take several minutes while the game downloads its resources, especially on a new regional entry. Wait for the game download to finish and the **ON** badge before testing a replay. Leave the debugging notice attached until verification completes.
+
 The preference is saved: future game loads activate automatically. Click the gear in the upper-right corner to open Settings. Choose English or 简体中文 under Language, and Light, Dark, or System under Theme. Both preferences are saved. **Never enable/reload during a live match.**
 
 ## 4. Disable or remove
@@ -63,6 +65,8 @@ To uninstall, remove Yakuman FX from the browser's extension manager and reload 
 Close the game. Extract the new release and replace the extension files in the same installed folder. Return to the browser's extension manager, click Yakuman FX's **Reload** button, and reopen the game.
 
 Use the same folder so the browser keeps referring to the same installation. Do not uninstall and reinstall just to update. There is no automatic release updater.
+
+If the browser disables an update because it adds regional site permissions, review the added sites and re-enable the extension in the extension manager.
 
 ## If something goes wrong
 

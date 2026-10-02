@@ -8,7 +8,7 @@
 <p align="center"><b>在浏览器中启用雀魂原生役满动画。</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.10-fa8072?style=flat-square" alt="版本 0.2.10"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.11-fa8072?style=flat-square" alt="版本 0.2.11"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome 与 Edge 桌面版">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="预览版">
@@ -52,8 +52,8 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 | 游戏入口 | 客户端构建 | 验证情况 |
 | --- | --- | --- |
 | [中文入口](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | 独立 Edge 环境验证启动流程；用户已确认牌谱动画可播放 |
-| [国际服入口](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | 已检查引导资源；验证环境无法连接资源 CDN，尚未支持 |
-| [日服入口](https://game.mahjongsoul.com/) | 尚未确认 | 验证环境连接超时，尚未支持 |
+| [国际服入口](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | 框架与 ASTC／DXT 核心资源已校验；独立 Edge 启动验证通过；牌谱播放待用户验证 |
+| [日服入口](https://game.mahjongsoul.com/) | `jp-WebGL-release-4.0.12(13)` | 框架与 ASTC／DXT 核心资源已校验；独立 Edge 启动验证通过；牌谱播放待用户验证 |
 
 以上版本是 Unity 框架构建标识，不等同于大厅显示的内容更新版本。扩展还会校验固定的资源 SHA-256；仅版本号相同并不代表兼容。游戏更新后可能需要更新扩展。完整构建和资源校验信息见 [兼容性记录](docs/COMPATIBILITY.md)。
 
@@ -63,7 +63,7 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 **下载 → 解压 → 加载扩展 → 大厅启用**
 
-1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.2.10.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
+1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.2.11.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
 2. 打开 `edge://extensions` 或 `chrome://extensions`，开启 **开发者模式**。
 3. 点击 **加载解压缩的扩展**，选择包含 `manifest.json` 的文件夹。
 4. 打开支持的雀魂入口，停留在大厅，点击扩展内的 **Enable & Reload**。
@@ -100,7 +100,7 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 扩展校验官方框架和资源包，在本地执行三处等长脚本修改，再将验证通过的读取指向 Unity 临时虚拟文件。原持久缓存写入不变，未知资源会被拒绝修改。
 
-没有分析统计、广告、遥测服务或开发者运营的服务器。官方资源从游戏域名下载并在本地处理。扩展不拦截游戏 WebSocket 消息，也不主动读取账号凭据；这些行为不构成账号安全保证。权限和数据处理详情见 [隐私说明](PRIVACY.md)。
+没有分析统计、广告、遥测服务或开发者运营的服务器。官方资源从游戏域名或官方资源 CDN 下载并在本地处理。扩展不拦截游戏 WebSocket 消息，也不主动读取账号凭据；这些行为不构成账号安全保证。权限和数据处理详情见 [隐私说明](PRIVACY.md)。
 
 ## 开发
 
@@ -117,3 +117,4 @@ npm test
 本项目原创代码使用 [GPL-3.0-only](LICENSE)。分发修改版时需要遵守 GPL 的源码及许可证要求。此许可证不授予雀魂专有代码或资源的权利；相关权利归原权利人所有。
 
 本仓库仅分发公开浏览器扩展，不包含私人桌面集成、提取的游戏脚本、重打包资源、Steam 资产或账号数据。
+

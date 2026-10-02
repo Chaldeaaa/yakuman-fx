@@ -1,13 +1,38 @@
 {
   "manifest_version": 3,
   "name": "Yakuman FX",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Restore native yakuman animations on supported Mahjong Soul builds.",
   "minimum_chrome_version": "118",
-  "permissions": ["debugger", "storage", "webNavigation"],
-  "host_permissions": ["https://game.maj-soul.com/*"],
-  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": [
+    "debugger",
+    "storage",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://game.maj-soul.com/*",
+    "https://game.mahjongsoul.com/*",
+    "https://mahjongsoul.game.yo-star.com/*",
+    "https://appstatic.mahjongsoul.com/v4/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "options_page": "troubleshooting.html",
-  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
-  "action": { "default_popup": "popup.html", "default_title": "Yakuman FX", "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png" } }
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Yakuman FX",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  }
 }

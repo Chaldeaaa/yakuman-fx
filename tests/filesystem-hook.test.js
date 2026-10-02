@@ -2,6 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {filesystemHook} from '../extension/filesystem-hook.js';
+
+test('regional texture variants use separate verified replacements and accept cache suffixes',()=>{
+  const bytes=Uint8Array.from(Buffer.from('123456789')),files=[];
+  const FS={open(path){return path;},lookupPath(){return{node:{contents:bytes,usedBytes:9}};},createDataFile(...args){files.push(args);}};
+  const variants=[{basename:'2_tsh_astc',size:9,crc:0xcbf43926,base64:btoa('astc')},{basename:'2_tsh_dxt',size:9,crc:0xcbf43926,base64:btoa('dxt')}];
+  vm.runInNewContext(filesystemHook(variants),{FS,window:{},atob,Uint8Array,console:{info(){}}});
+  assert.equal(FS.open('/cache/2_tsh_astc',577),'/cache/2_tsh_astc');
+  assert.equal(FS.open('/cache/2_tsh_astc',32768),'/tmp/yakuman-native-core-0.majset');
+  assert.equal(FS.open('/cache/2_tsh_dxt.majset','rb'),'/tmp/yakuman-native-core-1.majset');
+  assert.equal(files.length,2);assert.equal(Buffer.from(files[0][2]).toString(),'astc');assert.equal(Buffer.from(files[1][2]).toString(),'dxt');
+  assert.equal(FS.open('/cache/2_tsh_unknown',32768),'/cache/2_tsh_unknown');
+});
 test('hook substitutes verified reads, keeps writes intact, and fails safely on changed cache',()=>{
   const source=new Uint8Array(Buffer.from('123456789')),calls=[],files=[];
   const FS={open(path){calls.push(path);return path;},lookupPath(){return{node:{contents:source,usedBytes:9}};},createDataFile(...args){files.push(args);}};

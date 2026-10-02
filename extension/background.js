@@ -1,23 +1,24 @@
-import {buildPatch,base64,sha256,supported} from './bundle.js';
+import {buildPatch,base64,sha256} from './bundle.js';
+import {clientForUrl} from './clients.js';
 import {filesystemHook} from './filesystem-hook.js';
 
 const sessions=new Map();
 const plannedDetach=new Map();
-let prepared;
-const isGame=url=>{try{const u=new URL(url);return u.origin==='https://game.maj-soul.com'&&u.pathname==='/1/';}catch{return false;}};
+const prepared=new Map();
+const isGame=url=>!!clientForUrl(url);
 const send=(tabId,method,params={})=>chrome.debugger.sendCommand({tabId},method,params);
 async function status(tabId,state,message){
   await chrome.storage.session.set({['tab:'+tabId]:{state,message}});
   await chrome.action.setBadgeText({tabId,text:state==='enabled'?'ON':state==='error'?'!':state==='attached'?'…':''}).catch(()=>{});
   await chrome.action.setBadgeBackgroundColor({tabId,color:state==='error'?'#b84242':'#267864'}).catch(()=>{});
 }
-async function patch(){
-  if(!prepared)prepared=(async()=>{
-    const response=await fetch(supported.coreUrl,{credentials:'omit',cache:'no-cache',signal:AbortSignal.timeout(20000)});
+async function patch(core){
+  if(!prepared.has(core.coreUrl))prepared.set(core.coreUrl,(async()=>{
+    const response=await fetch(core.coreUrl,{credentials:'omit',cache:'no-cache',signal:AbortSignal.timeout(20000)});
     if(!response.ok)throw Error('Official resource download failed: '+response.status);
-    return base64(await buildPatch(new Uint8Array(await response.arrayBuffer())));
-  })().catch(error=>{prepared=undefined;throw error;});
-  return prepared;
+    return base64(await buildPatch(new Uint8Array(await response.arrayBuffer()),core));
+  })().catch(error=>{prepared.delete(core.coreUrl);throw error;}));
+  return prepared.get(core.coreUrl);
 }
 async function attach(tabId){
   if(sessions.has(tabId))return;
@@ -29,7 +30,8 @@ async function attach(tabId){
   try{
     await chrome.debugger.attach({tabId},'1.3');
     connected=true;
-    await send(tabId,'Fetch.enable',{patterns:[{urlPattern:'https://game.maj-soul.com/1/Build/*.framework.js.gz',requestStage:'Response'}]});
+    const client=clientForUrl(current.url);
+    await send(tabId,'Fetch.enable',{patterns:[{urlPattern:client.entry+'Build/*.framework.js.gz',requestStage:'Response'}]});
     sessions.get(tabId).ready=true;
     await status(tabId,'attached','Ready for the next game load. Reload only in the lobby.');
   }catch(error){
@@ -60,15 +62,16 @@ async function intercept(tabId,event){
   try{
     const url=new URL(event.request.url);
     if(event.request.method!=='GET'||event.responseStatusCode!==200)return;
-    if(url.origin!=='https://game.maj-soul.com'||!url.pathname.endsWith('/'+supported.frameworkName))throw Error('Unsupported client framework. No modification applied.');
+    const client=clientForUrl((await chrome.tabs.get(tabId)).url);
+    if(!client||url.origin!==new URL(client.entry).origin||url.pathname!==new URL(client.entry).pathname+'Build/'+client.frameworkName)throw Error('Unsupported client framework. No modification applied.');
     const response=await send(tabId,'Fetch.getResponseBody',{requestId:event.requestId});
     const source=response.base64Encoded?Uint8Array.from(atob(response.body),c=>c.charCodeAt(0)):new TextEncoder().encode(response.body);
-    if(await sha256(source)!==supported.frameworkHash)throw Error('Unsupported client framework. No modification applied.');
+    if(await sha256(source)!==client.frameworkHash)throw Error('Unsupported client framework. No modification applied.');
     const text=new TextDecoder().decode(source),anchor='Module["FS_createDataFile"]=FS.createDataFile;';
     if(!text.includes(anchor))throw Error('Missing framework entry point.');
-    const payload=await patch();
+    const variants=await Promise.all(client.cores.map(async core=>({base64:await patch(core),basename:new URL(core.coreUrl).pathname.split('/').pop(),size:core.coreSize,crc:core.coreCrc})));
     if(!(await chrome.storage.local.get('enabled')).enabled)return;
-    const hook=filesystemHook(payload,new URL(supported.coreUrl).pathname.split('/').pop(),supported.coreSize,supported.coreCrc);
+    const hook=filesystemHook(variants);
     const body=base64(new TextEncoder().encode(text.replace(anchor,anchor+hook)));
     await send(tabId,'Fetch.fulfillRequest',{requestId:event.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/javascript'},{name:'Cache-Control',value:'no-store'}],body});
     fulfilled=true;
@@ -133,7 +136,7 @@ setInterval(()=>{
     void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,hook:value}});
     if(value?.bundleReads>0&&report.unityReady)return finish(tabId);
     if(value?.failure)return status(tabId,'error','Resource substitution blocked: '+value.failure.reason+'. See Extension options for details.');
-    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,'error',value?'Hook loaded, but the expected core has not been read. See Extension options.':'Hook not found in the main game context. See Extension options.');
+    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,value?'attached':'error',value?'Still loading game resources. Reload only in the lobby if loading stalls.':'Hook not found in the main game context. See Extension options.');
   }).catch(error=>{
     void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,reason:'runtime-query-failed',error:error.message}});
     void status(tabId,'error','Runtime verification failed. See Extension options for the browser error.');
