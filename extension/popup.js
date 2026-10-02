@@ -2,7 +2,7 @@ const status=document.querySelector('#status');
 const [tab]=await chrome.tabs.query({active:true,currentWindow:true});
 let valid=false;
 try{const url=new URL(tab.url);valid=url.origin==='https://game.maj-soul.com'&&url.pathname==='/1/';}catch{}
-for(const button of document.querySelectorAll('button'))button.disabled=!valid;
+for(const id of ['enable','restore','reload'])document.querySelector('#'+id).disabled=!valid;
 async function refresh(){
   if(!valid){status.textContent='Open https://game.maj-soul.com/1/ to use Yakuman FX.';return;}
   const settings=await chrome.storage.local.get('enabled');
@@ -18,3 +18,5 @@ async function act(action){
 for(const action of ['enable','restore','reload'])document.querySelector('#'+action).addEventListener('click',()=>void act(action));
 chrome.storage.onChanged.addListener(()=>void refresh());
 await refresh();
+import {setupTheme} from './theme.js';
+await setupTheme();

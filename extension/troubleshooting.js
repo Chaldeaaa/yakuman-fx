@@ -5,3 +5,5 @@ async function refresh(){
 }
 document.querySelector('#refresh').addEventListener('click',()=>void refresh());
 await refresh();
+import {setupTheme} from './theme.js';
+await setupTheme();
