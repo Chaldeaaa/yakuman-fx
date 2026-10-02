@@ -12,8 +12,8 @@ async function refresh(){
 async function act(action){
   if(action==='reload'&&!confirm('Reload the game now? Continue only when you are in the lobby.'))return;
   status.textContent='Working…';
-  try{const result=await chrome.runtime.sendMessage({action,tabId:tab.id});if(!result.ok)throw Error(result.error);await refresh();}catch(error){status.textContent=error.message;}
+  try{const result=await chrome.runtime.sendMessage({action,tabId:tab.id});if(!result.ok)throw Error(result.error);if(action==='diagnostics'){const details=document.querySelector('#details');details.hidden=false;details.textContent=JSON.stringify(result.diagnostics,null,2);}await refresh();}catch(error){status.textContent=error.message;}
 }
-for(const action of ['enable','restore','reload'])document.querySelector('#'+action).addEventListener('click',()=>void act(action));
+for(const action of ['enable','restore','reload','diagnostics'])document.querySelector('#'+action).addEventListener('click',()=>void act(action));
 chrome.storage.onChanged.addListener(()=>void refresh());
 await refresh();

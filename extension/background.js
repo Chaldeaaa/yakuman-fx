@@ -20,16 +20,24 @@ async function patch(){
 }
 async function attach(tabId){
   if(sessions.has(tabId))return;
+  const current=await chrome.tabs.get(tabId);
+  if(!isGame(current.url))throw Error('Wait until the supported game page has finished navigating.');
+  if(sessions.has(tabId))return;
   sessions.set(tabId,{ready:false});
+  let connected=false;
   try{
     await chrome.debugger.attach({tabId},'1.3');
+    connected=true;
     await send(tabId,'Fetch.enable',{patterns:[{urlPattern:'https://game.maj-soul.com/1/Build/*.framework.js.gz',requestStage:'Response'}]});
     sessions.get(tabId).ready=true;
     await status(tabId,'attached','Ready for the next game load. Reload only in the lobby.');
   }catch(error){
     sessions.delete(tabId);
-    await chrome.debugger.detach({tabId}).catch(()=>{});
-    await status(tabId,'error',error.message);
+    if(connected)await chrome.debugger.detach({tabId}).catch(()=>{});
+    const message=error.message.includes('chrome-extension://')?
+      'Browser refused debugger access. Another extension may have embedded a page in this tab. Reload in the lobby to retry; if it persists, use a profile without page-injecting extensions.':error.message;
+    await status(tabId,'error',message);
+    throw Error(message);
   }
 }
 async function detach(tabId){
@@ -58,6 +66,7 @@ async function intercept(tabId,event){
     const body=base64(new TextEncoder().encode(text.replace(anchor,anchor+hook)));
     await send(tabId,'Fetch.fulfillRequest',{requestId:event.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/javascript'},{name:'Cache-Control',value:'no-store'}],body});
     fulfilled=true;
+    if(sessions.has(tabId))sessions.get(tabId).installedAt=Date.now();
     await status(tabId,'attached','Temporary hook installed. Waiting for verified resource reads.');
   }catch(error){await status(tabId,'error',error.message);}
   finally{if(!fulfilled)await send(tabId,'Fetch.continueRequest',{requestId:event.requestId}).catch(()=>{});}
@@ -69,7 +78,11 @@ chrome.debugger.onDetach.addListener(source=>{
 chrome.webNavigation.onBeforeNavigate.addListener(details=>{
   if(details.frameId!==0)return;
   if(!isGame(details.url)){if(sessions.has(details.tabId))void detach(details.tabId);return;}
-  void chrome.storage.local.get('enabled').then(settings=>{if(settings.enabled)return attach(details.tabId);});
+  // The old document can be an extension's new-tab page. Never attach to it.
+});
+chrome.webNavigation.onCommitted.addListener(details=>{
+  if(details.frameId!==0||!isGame(details.url))return;
+  void chrome.storage.local.get('enabled').then(settings=>{if(settings.enabled)return attach(details.tabId);}).catch(()=>{});
 });
 chrome.tabs.onRemoved.addListener(tabId=>{sessions.delete(tabId);void chrome.storage.session.remove('tab:'+tabId);});
 chrome.runtime.onMessage.addListener((message,sender,respond)=>{
@@ -85,8 +98,12 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
       for(const tabId of [...sessions.keys()])await detach(tabId);
       await status(tab.id,'disabled','Automatic effects disabled. Reload in the lobby to remove the current temporary patch.');
     }else if(message.action==='reload'){
-      if((await chrome.storage.local.get('enabled')).enabled)await attach(tab.id);
+      // Retry after the new document commits, rather than attaching to old iframes.
       await chrome.tabs.reload(tab.id,{bypassCache:true});
+    }else if(message.action==='diagnostics'){
+      const state=await chrome.storage.session.get('diagnostics:'+tab.id);
+      respond({ok:true,diagnostics:state['diagnostics:'+tab.id]||{reason:'No runtime diagnostic received. Connection may be detached.'}});
+      return;
     }else throw Error('Unknown action');
     respond({ok:true});
   })().catch(error=>respond({ok:false,error:error.message}));
@@ -96,8 +113,14 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
 setInterval(()=>{
   for(const [tabId,session]of sessions)if(session.ready)void send(tabId,'Runtime.evaluate',{expression:'JSON.stringify(window.__yakumanNative||null)',returnByValue:true}).then(result=>{
     const value=JSON.parse(result.result.value||'null');
+    void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,hook:value}});
     if(value?.bundleReads>0)return status(tabId,'enabled','Verified temporary patch loaded. Live-match playback is not yet validated.');
-  }).catch(()=>{});
+    if(value?.failure)return status(tabId,'error','Resource substitution blocked: '+value.failure.reason+'. Open Diagnostics for details.');
+    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,'error',value?'Hook loaded, but the expected core has not been read. Open Diagnostics.':'Hook not found in the main game context. Open Diagnostics.');
+  }).catch(error=>{
+    void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,reason:'runtime-query-failed',error:error.message}});
+    void status(tabId,'error','Runtime verification failed. Open Diagnostics for the browser error.');
+  });
 },3000);
 // Recover sessions after a service-worker restart without forcing a game reload.
 void chrome.storage.local.get('enabled').then(async settings=>{

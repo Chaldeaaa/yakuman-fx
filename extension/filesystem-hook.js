@@ -5,7 +5,7 @@ export function filesystemHook(base64, basename, expectedSize, expectedCrc32, pr
     var originalOpen=FS.open;
     var replacementPath='/tmp/yakuman-native-core.majset';
     var installed=false;
-    window.__yakumanNative={bundleReads:0,candidates:[],mode:${JSON.stringify(presentationMode)}};
+    window.__yakumanNative={bundleReads:0,candidates:[],mode:${JSON.stringify(presentationMode)},failure:null};
     FS.open=function(path,flags,mode){
       if(typeof path==='string'&&path.indexOf('2_tsh_')!==-1&&window.__yakumanNative.candidates.length<20)window.__yakumanNative.candidates.push({name:path.split('/').pop(),flags:flags});
       if(typeof path==='string' && path.split('/').pop()===${JSON.stringify(basename)} && (flags==='r'||flags==='rb'||(typeof flags==='number'&&(flags&3)===0))){
@@ -13,14 +13,14 @@ export function filesystemHook(base64, basename, expectedSize, expectedCrc32, pr
           try{
             var node=FS.lookupPath(path).node;
             var source=node.contents;
-            if(!source||node.usedBytes!==${expectedSize})return originalOpen.call(FS,path,flags,mode);
+            if(!source||node.usedBytes!==${expectedSize}){window.__yakumanNative.failure={reason:'cache-size',actual:node.usedBytes,expected:${expectedSize}};return originalOpen.call(FS,path,flags,mode);}
             var crc=0xffffffff;
             for(var index=0;index<node.usedBytes;index++){
               crc^=source[index];
               for(var bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);
             }
-            if(((crc^0xffffffff)>>>0)!==${expectedCrc32})return originalOpen.call(FS,path,flags,mode);
-          }catch(error){return originalOpen.call(FS,path,flags,mode);}
+            if(((crc^0xffffffff)>>>0)!==${expectedCrc32}){window.__yakumanNative.failure={reason:'cache-checksum',actual:(crc^0xffffffff)>>>0};return originalOpen.call(FS,path,flags,mode);}
+          }catch(error){window.__yakumanNative.failure={reason:'cache-unavailable'};return originalOpen.call(FS,path,flags,mode);}
           var binary=atob(${JSON.stringify(base64)});
           var bytes=new Uint8Array(binary.length);
           for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
