@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.env
+.env.*
+research/
+build/
+*.majset
+*.unity3d
+__pycache__/

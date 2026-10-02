@@ -1,0 +1,9 @@
+{
+  "name": "yakuman-fx",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-local native yakuman animation restoration for Mahjong Soul.",
+  "scripts": { "test": "node --test tests/*.test.js" },
+  "engines": { "node": ">=22" }
+}
