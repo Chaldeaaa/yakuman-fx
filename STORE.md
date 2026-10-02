@@ -2,6 +2,12 @@
 
 Status: not submitted or approved.
 
+## Product polish before stable release
+
+- Design an original extension icon and include the required toolbar/store sizes.
+- Diagnostics have been moved out of the main popup into Extension options. This view reads saved startup diagnostics without attaching a debugger.
+- Debugging now disconnects automatically after verified bundle reads and Unity initialization. The browser-controlled notice appears during startup, then the debugging session ends normally. The in-memory patch remains until reload. An integration without the Debugger API would still be needed to avoid even the startup notice. Do not suppress notices through browser flags or settings.
+
 The extension has a single purpose: restore native yakuman presentation in a supported Mahjong Soul WebGL build. Its original logic is packaged locally and readable. Proprietary game resources are obtained from the official origin and modified locally; they are not included in the extension ZIP.
 
 Permissions:

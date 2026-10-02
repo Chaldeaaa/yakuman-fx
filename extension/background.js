@@ -2,6 +2,7 @@ import {buildPatch,base64,sha256,supported} from './bundle.js';
 import {filesystemHook} from './filesystem-hook.js';
 
 const sessions=new Map();
+const plannedDetach=new Map();
 let prepared;
 const isGame=url=>{try{const u=new URL(url);return u.origin==='https://game.maj-soul.com'&&u.pathname==='/1/';}catch{return false;}};
 const send=(tabId,method,params={})=>chrome.debugger.sendCommand({tabId},method,params);
@@ -40,10 +41,15 @@ async function attach(tabId){
     throw Error(message);
   }
 }
-async function detach(tabId){
+async function detach(tabId,reason='disabled'){
+  plannedDetach.set(tabId,reason);
   sessions.delete(tabId);
   await send(tabId,'Fetch.disable').catch(()=>{});
   await chrome.debugger.detach({tabId}).catch(()=>{});
+}
+async function finish(tabId){
+  await detach(tabId,'loaded');
+  await status(tabId,'enabled','Native effects loaded. Debugging disconnected.');
 }
 chrome.debugger.onEvent.addListener((source,method,event)=>{
   if(method!=='Fetch.requestPaused'||source.tabId===undefined)return;
@@ -73,6 +79,10 @@ async function intercept(tabId,event){
 }
 chrome.debugger.onDetach.addListener(source=>{
   sessions.delete(source.tabId);
+  const reason=plannedDetach.get(source.tabId);
+  plannedDetach.delete(source.tabId);
+  if(reason==='loaded'){void status(source.tabId,'enabled','Native effects loaded. Debugging disconnected.');return;}
+  if(reason)return;
   void status(source.tabId,'detached','Disconnected. Reload in the lobby after enabling to apply changes.');
 });
 chrome.webNavigation.onBeforeNavigate.addListener(details=>{
@@ -84,7 +94,7 @@ chrome.webNavigation.onCommitted.addListener(details=>{
   if(details.frameId!==0||!isGame(details.url))return;
   void chrome.storage.local.get('enabled').then(settings=>{if(settings.enabled)return attach(details.tabId);}).catch(()=>{});
 });
-chrome.tabs.onRemoved.addListener(tabId=>{sessions.delete(tabId);void chrome.storage.session.remove('tab:'+tabId);});
+chrome.tabs.onRemoved.addListener(tabId=>{sessions.delete(tabId);plannedDetach.delete(tabId);void chrome.storage.session.remove(['tab:'+tabId,'diagnostics:'+tabId]);});
 chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(sender.id!==chrome.runtime.id)return;
   void(async()=>{
@@ -114,16 +124,21 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
 });
 // Chrome 118+ keeps debugger sessions alive; a periodic check reports our own hook only.
 setInterval(()=>{
-  for(const [tabId,session]of sessions)if(session.ready)void send(tabId,'Runtime.evaluate',{expression:'JSON.stringify(window.__yakumanNative||null)',returnByValue:true}).then(result=>{
-    const value=JSON.parse(result.result.value||'null');
+  for(const [tabId,session]of sessions)if(session.ready&&!session.checking){
+    session.checking=true;
+    void send(tabId,'Runtime.evaluate',{expression:'JSON.stringify({hook:window.__yakumanNative||null,unityReady:!!window.unityInstance?.Module?.HEAPU8})',returnByValue:true}).then(async result=>{
+    if(sessions.get(tabId)!==session)return;
+    const report=JSON.parse(result.result.value||'null');
+    const value=report?.hook;
     void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,hook:value}});
-    if(value?.bundleReads>0)return status(tabId,'enabled','Verified temporary patch loaded. Live-match playback is not yet validated.');
-    if(value?.failure)return status(tabId,'error','Resource substitution blocked: '+value.failure.reason+'. Open Diagnostics for details.');
-    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,'error',value?'Hook loaded, but the expected core has not been read. Open Diagnostics.':'Hook not found in the main game context. Open Diagnostics.');
+    if(value?.bundleReads>0&&report.unityReady)return finish(tabId);
+    if(value?.failure)return status(tabId,'error','Resource substitution blocked: '+value.failure.reason+'. See Extension options for details.');
+    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,'error',value?'Hook loaded, but the expected core has not been read. See Extension options.':'Hook not found in the main game context. See Extension options.');
   }).catch(error=>{
     void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,reason:'runtime-query-failed',error:error.message}});
-    void status(tabId,'error','Runtime verification failed. Open Diagnostics for the browser error.');
-  });
+    void status(tabId,'error','Runtime verification failed. See Extension options for the browser error.');
+  }).finally(()=>{session.checking=false;});
+  }
 },3000);
 // Recover sessions after a service-worker restart without forcing a game reload.
 void chrome.storage.local.get('enabled').then(async settings=>{
@@ -137,3 +152,4 @@ void chrome.storage.local.get('enabled').then(async settings=>{
     }catch{ /* A target attached by another debugger is not ours. */ }
   }
 }).catch(()=>{});
+
