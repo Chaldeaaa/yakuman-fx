@@ -8,7 +8,7 @@
 <p align="center"><b>在浏览器中启用雀魂原生役满动画。</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.9-fa8072?style=flat-square" alt="版本 0.2.9"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.10-fa8072?style=flat-square" alt="版本 0.2.10"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome 与 Edge 桌面版">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="预览版">
@@ -20,7 +20,7 @@
 
 ---
 
-Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效。安装后在大厅启用一次，以后打开游戏就会自动启用。无需 Steam 客户端、桌面辅助程序或命令行窗口。扩展界面支持 English／简体中文，可通过右上角齿轮进入设置切换。
+Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效。安装后在大厅启用一次，以后打开游戏就会自动启用。无需 Steam 客户端、桌面辅助程序或命令行窗口。扩展界面支持 English／简体中文，可通过右上角齿轮进入设置切换语言，并选择浅色／深色／跟随系统主题。
 
 > [!WARNING]
 > **账号风险与免责声明：** 本项目是非官方客户端修改工具，与雀魂及其运营方无关联，也未获得其认可。使用本工具可能违反游戏规则或服务条款，导致账号限制、暂时封禁或永久封禁。本项目不保证账号安全，使用风险由用户自行承担。软件不提供担保，详见 [LICENSE](LICENSE)。
@@ -40,7 +40,7 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 | 原生特效 | 一次启用 | 便捷控制 |
 | :---: | :---: | :---: |
-| 根据真实和牌手牌播放飞牌与役满动画。 | 在大厅启用一次，以后加载游戏自动生效。 | Restore Default 关闭自动启用，太阳／月亮按钮切换主题。 |
+| 根据真实和牌手牌播放飞牌与役满动画。 | 在大厅启用一次，以后加载游戏自动生效。 | Restore Default 关闭自动启用，设置中可选择浅色、深色或跟随系统。 |
 
 > [!NOTE]
 > 官方资源在本地校验，未知客户端构建不会被修改。
@@ -63,7 +63,7 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 **下载 → 解压 → 加载扩展 → 大厅启用**
 
-1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.2.9.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
+1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.2.10.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
 2. 打开 `edge://extensions` 或 `chrome://extensions`，开启 **开发者模式**。
 3. 点击 **加载解压缩的扩展**，选择包含 `manifest.json` 的文件夹。
 4. 打开支持的雀魂入口，停留在大厅，点击扩展内的 **Enable & Reload**。

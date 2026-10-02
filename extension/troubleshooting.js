@@ -1,7 +1,9 @@
 import {setupLanguage,translate} from './i18n.js';
 import {setupTheme} from './theme.js';
+import {setupDropdowns} from './dropdown.js';
 await setupLanguage();
 await setupTheme();
+setupDropdowns();
 async function refresh(){
   const all=await chrome.storage.session.get(null);
   const diagnostics=Object.fromEntries(Object.entries(all).filter(([key])=>key.startsWith('diagnostics:')));

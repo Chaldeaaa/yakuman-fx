@@ -4,7 +4,7 @@ Checked on 2026-10-02. A build label is not a substitute for the extension's res
 
 | Entry | Framework build | Status |
 | --- | --- | --- |
-| `https://game.maj-soul.com/1/` | `chs_t-WebGL-release-4.0.47(47)` | Enabled in v0.2.9; verified startup and user-confirmed replay playback |
+| `https://game.maj-soul.com/1/` | `chs_t-WebGL-release-4.0.47(47)` | Enabled in v0.2.10; verified startup and user-confirmed replay playback |
 | `https://mahjongsoul.game.yo-star.com/` | `en-WebGL-release-4.0.10(11)` | Public entry/bootstrap inspected; not enabled |
 | `https://game.mahjongsoul.com/` | Not established | Local connection timed out; not enabled |
 
