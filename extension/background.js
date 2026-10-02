@@ -92,7 +92,10 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
     if(!isGame(tab.url))throw Error('Open the supported Mahjong Soul game page first.');
     if(message.action==='enable'){
       await chrome.storage.local.set({enabled:true});
-      await attach(tab.id);
+      // Attach only once the fresh game document commits. This also avoids
+      // third-party extension frames in the currently loaded document.
+      await status(tab.id,'attached','Automatic effects enabled. Reloading the game…');
+      await chrome.tabs.reload(tab.id,{bypassCache:true});
     }else if(message.action==='restore'){
       await chrome.storage.local.set({enabled:false});
       for(const tabId of [...sessions.keys()])await detach(tabId);
