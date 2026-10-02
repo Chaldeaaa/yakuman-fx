@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Yakuman FX",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Restore native yakuman animations on supported Mahjong Soul builds.",
   "minimum_chrome_version": "118",
   "permissions": ["debugger", "storage", "webNavigation"],
   "host_permissions": ["https://game.maj-soul.com/*"],
   "background": { "service_worker": "background.js", "type": "module" },
   "options_page": "troubleshooting.html",
-  "action": { "default_popup": "popup.html", "default_title": "Yakuman FX" }
+  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
+  "action": { "default_popup": "popup.html", "default_title": "Yakuman FX", "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png" } }
 }

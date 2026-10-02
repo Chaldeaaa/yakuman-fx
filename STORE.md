@@ -4,7 +4,7 @@ Status: not submitted or approved.
 
 ## Product polish before stable release
 
-- Design an original extension icon and include the required toolbar/store sizes.
+- A temporary original hand-drawn 和 / Fx icon is included at 16, 32, 48, and 128 pixels. Final branding and store screenshots remain pending.
 - Diagnostics have been moved out of the main popup into Extension options. This view reads saved startup diagnostics without attaching a debugger.
 - Debugging now disconnects automatically after verified bundle reads and Unity initialization. The browser-controlled notice appears during startup, then the debugging session ends normally. The in-memory patch remains until reload. An integration without the Debugger API would still be needed to avoid even the startup notice. Do not suppress notices through browser flags or settings.
 
