@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="170" viewBox="0 0 640 170" role="img" aria-labelledby="title">
+<title id="title">Yakuman FX — Native yakuman animations</title>
+<rect x="18" y="21" width="128" height="128" rx="24" fill="#1d1f23"/>
+<g transform="translate(18 21)" fill="none" stroke="#f7f7fa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 30L57 22M18 44L59 41M40 25L38 98M37 47L15 80M40 52L61 73M68 34L105 30L101 91L67 94Z"/></g>
+<ellipse cx="114" cy="123" rx="30" ry="24" fill="#fa8072"/>
+<text x="94" y="133" fill="#291b1b" font-family="Arial,sans-serif" font-size="27" font-weight="700" font-style="italic">Fx</text>
+<text x="177" y="92" fill="#29262c" font-family="Segoe UI,Arial,sans-serif" font-size="53" font-weight="750" letter-spacing="-2">Yakuman <tspan fill="#fa8072">FX</tspan></text>
+<text x="180" y="124" fill="#29262c" opacity=".7" font-family="Segoe UI,Arial,sans-serif" font-size="16" letter-spacing="1.4">NATIVE YAKUMAN ANIMATIONS</text>
+</svg>

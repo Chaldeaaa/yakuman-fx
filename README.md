@@ -1,16 +1,29 @@
-<p align="center"><img src="extension/icons/icon-128.png" width="96" alt="Yakuman FX icon"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+    <img src="assets/banner-light.svg" width="560" alt="Yakuman FX">
+  </picture>
+</p>
 
-# Yakuman FX
+<p align="center"><b>Bring native yakuman animations to Mahjong Soul in your browser.</b></p>
 
-**Bring native yakuman animations to Mahjong Soul in your browser.**
+<p align="center">
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.8-fa8072?style=flat-square" alt="Version 0.2.8"></a>
+  <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome and Edge desktop">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
+  <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="Preview">
+</p>
 
-English · [简体中文](README.zh-CN.md)
+<p align="center"><b>English</b> · <a href="README.zh-CN.md">简体中文</a></p>
 
-[Download](https://github.com/Chaldeaaa/yakuman-fx/releases) · [Installation guide](docs/INSTALL.md) · [Report an issue](https://github.com/Chaldeaaa/yakuman-fx/issues)
+<p align="center"><a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><b>Download</b></a> · <a href="docs/INSTALL.md">Installation guide</a> · <a href="https://github.com/Chaldeaaa/yakuman-fx/issues">Report an issue</a></p>
+
+---
 
 Yakuman FX restores the game's built-in Unity effects using the actual winning hand. Install once and enable in the lobby; effects activate automatically on future visits. No Steam client, desktop helper, or command window is required.
 
-> **Disclaimer:** This is an unofficial client modification, not affiliated with or endorsed by Mahjong Soul or its operators. Using it may violate the game's terms or trigger account restrictions, including suspension or a permanent ban. No account-safety guarantee is provided. Use at your own risk. The software is provided without warranty; see [LICENSE](LICENSE).
+> [!WARNING]
+> **Account risk:** This is an unofficial client modification, not affiliated with or endorsed by Mahjong Soul or its operators. Using it may violate the game's terms or trigger account restrictions, including suspension or a permanent ban. No account-safety guarantee is provided. Use at your own risk. The software is provided without warranty; see [LICENSE](LICENSE).
 
 ## Contents
 
@@ -25,11 +38,14 @@ Yakuman FX restores the game's built-in Unity effects using the actual winning h
 
 ## Features
 
-- Native flying-tile and yakuman effects with the real completed hand.
-- Automatic activation after the first opt-in.
-- Restore Default to disable automatic effects.
-- Dark and light themes with a sun-and-moon toggle.
-- Local resource verification; unknown client builds are left unpatched.
+| Native effects | Install once | Easy to control |
+| :---: | :---: | :---: |
+| Flying tiles and yakuman animations driven by the real completed hand. | Activate from the lobby once; future game loads enable automatically. | Restore Default disables activation; the sun-and-moon button switches themes. |
+
+> [!NOTE]
+> Official resources are verified locally. Unknown client builds are left unpatched.
+
+---
 
 ## Compatibility
 
@@ -45,13 +61,18 @@ Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. E
 
 ## Quick start
 
+**Download → Extract → Load unpacked → Enable in the lobby**
+
 1. Download and extract `yakuman-fx-v0.2.8.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
 2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the folder containing `manifest.json`.
 4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.
 5. Confirm the lobby reminder and wait for **Native effects loaded. Debugging disconnected.**
 
-Keep the extracted folder in place. Future game loads activate automatically. No Node.js, Python, or local server is needed. Browser developer-mode reminders may appear. **Never reload during a live match.**
+> [!IMPORTANT]
+> Keep the extracted folder in place. **Never reload during a live match.**
+
+Future game loads activate automatically. No Node.js, Python, or local server is needed. Browser developer-mode reminders may appear.
 
 See the step-by-step [installation guide](docs/INSTALL.md) for folder selection, first activation, updates, and removal. This project is distributed outside browser extension stores.
 
