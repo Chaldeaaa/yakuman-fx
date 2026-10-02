@@ -4,7 +4,7 @@ Yakuman FX has no analytics, advertising, telemetry service, or developer-operat
 
 The extension requests the pinned official presentation bundle from `game.maj-soul.com` without credentials, builds a temporary replacement locally, and validates the game framework. These requests go to the game operator and remain subject to its network logging and policies.
 
-Local storage holds the automatic-enable and appearance preferences. Session storage holds per-tab status messages. The generated presentation bundle is kept in extension memory and then in the game's temporary virtual filesystem; it is not uploaded to a third party.
+Local storage holds the automatic-enable, appearance, and language preferences. Session storage holds per-tab status messages. The generated presentation bundle is kept in extension memory and then in the game's temporary virtual filesystem; it is not uploaded to a third party.
 
 Debugger access is used on supported game tabs to intercept the Unity framework response and read the extension's own diagnostic flag. The implementation does not intercept game WebSocket messages or intentionally read account credentials, hand histories, chat, or other gameplay messages.
 

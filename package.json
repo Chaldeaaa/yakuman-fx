@@ -1,6 +1,6 @@
 {
   "name": "yakuman-fx",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "private": true,
   "type": "module",
   "description": "Browser-local native yakuman animation restoration for Mahjong Soul.",

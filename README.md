@@ -8,7 +8,7 @@
 <p align="center"><b>Bring native yakuman animations to Mahjong Soul in your browser.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.8-fa8072?style=flat-square" alt="Version 0.2.8"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.9-fa8072?style=flat-square" alt="Version 0.2.9"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome and Edge desktop">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="Preview">
@@ -63,7 +63,7 @@ Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. E
 
 **Download → Extract → Load unpacked → Enable in the lobby**
 
-1. Download and extract `yakuman-fx-v0.2.8.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
+1. Download and extract `yakuman-fx-v0.2.9.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
 2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the folder containing `manifest.json`.
 4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.
@@ -77,6 +77,8 @@ Future game loads activate automatically. No Node.js, Python, or local server is
 See the step-by-step [installation guide](docs/INSTALL.md) for folder selection, first activation, updates, and removal. This project is distributed outside browser extension stores.
 
 ## Disable and update
+
+**Language:** Click the gear in the popup's upper-right corner, then choose **English** or **简体中文** in Settings. The preference is saved and applies to both the popup and settings page.
 
 **Disable:** Click **Restore Default**, then reload in the lobby to remove the patch already loaded into the page. To uninstall, remove the extension in the browser's extension manager and reload the game.
 

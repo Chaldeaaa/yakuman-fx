@@ -50,7 +50,7 @@ Native effects loaded. Debugging disconnected.
 
 The toolbar badge should show **ON**. A “Temporary hook installed” message is only an intermediate state.
 
-The preference is saved: future game loads activate automatically. Switch the popup's appearance with the sun-and-moon button in the upper-right corner. **Never enable/reload during a live match.**
+The preference is saved: future game loads activate automatically. Switch the popup's appearance with the sun-and-moon button in the upper-right corner. Click the adjacent gear to open Settings and choose English or 简体中文; the language preference is saved. **Never enable/reload during a live match.**
 
 ## 4. Disable or remove
 

@@ -1,3 +1,4 @@
+import {translate} from './i18n.js';
 const choices=['night','day','system'];
 export async function setupTheme(){
   const media=matchMedia('(prefers-color-scheme: dark)');
@@ -7,13 +8,14 @@ export async function setupTheme(){
     document.documentElement.dataset.theme=choice==='system'?(media.matches?'night':'day'):choice;
     const toggle=document.getElementById('theme-toggle');
     if(toggle){
-      const label=document.documentElement.dataset.theme==='night'?'Switch to day mode':'Switch to night mode';
+      const label=translate(document.documentElement.dataset.theme==='night'?'Switch to day mode':'Switch to night mode');
       toggle.setAttribute('aria-label',label);
       toggle.title=label;
     }
     for(const button of document.querySelectorAll('button[data-theme]'))button.setAttribute('aria-pressed',String(button.dataset.theme===choice));
   }
   apply((await chrome.storage.local.get('theme')).theme);
+  document.addEventListener('languagechange',()=>apply(choice));
   document.getElementById('theme-toggle')?.addEventListener('click',async()=>{
     apply(document.documentElement.dataset.theme==='night'?'day':'night');
     await chrome.storage.local.set({theme:choice});
