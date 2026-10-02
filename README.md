@@ -1,65 +1,98 @@
+<p align="center"><img src="extension/icons/icon-128.png" width="96" alt="Yakuman FX icon"></p>
+
 # Yakuman FX
 
-Native yakuman animations for Mahjong Soul in your browser.
+**Bring native yakuman animations to Mahjong Soul in your browser.**
 
-## Status
+English · [简体中文](README.zh-CN.md)
 
-Version 0.2.8 is an unpacked browser-extension prototype with navigation-safe attachment and runtime diagnostics. An isolated headless Edge test confirmed extension loading, automatic attachment, four verified resource reads, Unity initialization, and restoration after reload. The user confirmed replay playback after the signed-byte cache correction in v0.2.3. Broader animation and audio validation remains outstanding. Chrome Web Store / Microsoft Edge Add-ons approval has not been obtained.
+[Download](https://github.com/Chaldeaaa/yakuman-fx/releases) · [Installation guide](docs/INSTALL.md) · [Report an issue](https://github.com/Chaldeaaa/yakuman-fx/issues)
 
-A private WebView2 prototype demonstrated native flying-tile animation in a Suuankou replay. Its flight audio was corrected and confirmed during replay playback. The live-match animation entry has been enabled in that prototype, but live-match playback and other yakuman remain untested. The private integration is not distributed in this repository.
+Yakuman FX restores the game's built-in Unity effects using the actual winning hand. Install once and enable in the lobby; effects activate automatically on future visits. No Steam client, desktop helper, or command window is required.
 
-## Install for local validation
+> **Disclaimer:** This is an unofficial client modification, not affiliated with or endorsed by Mahjong Soul or its operators. Using it may violate the game's terms or trigger account restrictions, including suspension or a permanent ban. No account-safety guarantee is provided. Use at your own risk. The software is provided without warranty; see [LICENSE](LICENSE).
 
-1. Download and extract the extension ZIP, or use this repository's `extension/` directory.
-2. Open `chrome://extensions` or `edge://extensions`, enable Developer mode, and choose Load unpacked.
-3. Select the directory containing `manifest.json`.
-4. Open `https://game.maj-soul.com/1/` and stay in the lobby. Click Yakuman FX, then Enable & Reload.
-5. Confirm the lobby reminder. The game reloads automatically; wait for Verified temporary patch loaded.
+## Contents
 
-If the popup remains at Waiting for verified resource reads, the patch has not been confirmed. Use Extension options in the browser extension manager to inspect saved cache-validation or runtime-query failures. A hook-installed message alone does not mean native effects are active.
+- [Features](#features)
+- [Compatibility](#compatibility)
+- [Quick start](#quick-start)
+- [Disable and update](#disable-and-update)
+- [Troubleshooting](#troubleshooting)
+- [How it works](#how-it-works)
+- [Development](#development)
+- [License](#license)
 
-The first opt-in is remembered. Future navigation to the supported game page automatically attaches. If the startup interception misses a load, the popup will remain in its waiting state; reload in the lobby. No external helper or command window is required. The browser briefly shows a debugging notice during startup. After verified resource reads and Unity initialization, the extension detaches automatically; the in-memory patch remains active until the page reloads. Opening DevTools or canceling the debugging notice before startup finishes may interrupt activation.
+## Features
 
-Restore Default disables automatic attachment and detaches. It does not immediately remove code already loaded into the game: reload in the lobby to finish restoration. Never reload during a live match.
+- Native flying-tile and yakuman effects with the real completed hand.
+- Automatic activation after the first opt-in.
+- Restore Default to disable automatic effects.
+- Dark and light themes with a sun-and-moon toggle.
+- Local resource verification; unknown client builds are left unpatched.
 
-## Appearance
+## Compatibility
 
-Night mode is the default: dark gray surfaces, bright text, and salmon accents. Use the sun-and-moon button in the upper-right corner to switch between Night and Day. The preference is saved locally and shared with the troubleshooting page.
+| Game entry | Client build | Validation |
+| --- | --- | --- |
+| [Chinese-language entry](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | Startup verified in isolated Edge; replay playback confirmed by the user |
+| [International entry](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | Bootstrap inspected; resource CDN unreachable during validation; not yet supported |
+| [Japanese entry](https://game.mahjongsoul.com/) | Not established | Connection timed out during validation; not yet supported |
 
-## Experience
+The build above is the Unity framework identifier, not the lobby's content-update number. Compatibility also depends on pinned SHA-256 resource checks; a matching version label alone is insufficient. Game updates may require an extension update. See [client compatibility details](docs/COMPATIBILITY.md).
 
-- Install the Chrome/Edge extension once and explicitly enable it.
-- Apply native effects automatically when a supported game page starts.
-- Show supported-version status and fail safely on unknown client builds.
-- Offer Restore Default without automatically reloading an active match.
-- Require no Steam client, desktop launcher, Node.js, or Python for end users.
+Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. Edge startup has been tested; equivalent Chrome playback testing remains pending. Live-match animation entry is enabled, but live-match playback and broader yakuman/audio coverage remain untested. Mobile browsers, Firefox, and desktop game clients are outside this distribution.
 
-The initial supported target is `https://game.maj-soul.com/1/`. Other regions, browsers, mobile clients, and future client builds are not established as supported.
+## Quick start
 
-## Technical direction
+1. Download and extract `yakuman-fx-v0.2.8.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
+2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and select the folder containing `manifest.json`.
+4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.
+5. Confirm the lobby reminder and wait for **Native effects loaded. Debugging disconnected.**
 
-The inspected WebGL client retains its native Unity yakuman controller but disables it and omits its resource group. The prototype restores resource loading and the native animation entry. The game controller supplies the real completed hand; the effect is not a recorded video. A narrowly scoped audio-channel correction prevents the flight lead-in from being stopped by ordinary sound cleanup.
+Keep the extracted folder in place. Future game loads activate automatically. No Node.js, Python, or local server is needed. Browser developer-mode reminders may appear. **Never reload during a live match.**
 
-Browser-local patch generation is implemented without third-party dependencies. It validates the official SHA-256, decompresses UnityFS LZ4 blocks, applies three length-preserving script edits, and rebuilds the container. Independent parsing confirmed that exactly three TextAssets changed and 65 remained byte-identical. Full visual/audible ordinary-browser playback validation is still required.
+See the step-by-step [installation guide](docs/INSTALL.md) for folder selection, first activation, updates, and removal. This project is distributed outside browser extension stores.
 
-The extension uses Chrome's Debugger API. It checks the framework SHA-256 and redirects reads of the verified cached core into a temporary in-memory file. Original persistent writes remain unchanged. The execution path must satisfy each store's policies; acceptance cannot be guaranteed. See `PRIVACY.md` and `STORE.md`.
+## Disable and update
+
+**Disable:** Click **Restore Default**, then reload in the lobby to remove the patch already loaded into the page. To uninstall, remove the extension in the browser's extension manager and reload the game.
+
+**Update:** Close the game, replace the extension files in the same installed folder with the new release, click the extension's **Reload** button in the browser extension manager, then reopen the game. Updates are manual.
+
+## Troubleshooting
+
+| Symptom | What to do |
+| --- | --- |
+| Browser says the tab is being debugged | Expected during startup. The extension disconnects after verified loading. Opening DevTools or canceling the notice early may interrupt activation. |
+| “Temporary hook installed” stays visible | Installation alone does not confirm activation. Inspect saved diagnostics in **Extension options** and retry from the lobby. |
+| Resource checksum or unsupported-framework error | The client/cache may differ from the pinned build. Leave it unpatched and check for an extension update. Include saved diagnostics in a bug report. |
+| “Cannot access a chrome-extension:// URL of different extension” | Another extension's frame may block attachment. Try a separate browser profile containing only Yakuman FX. |
+| No animation despite successful loading | Report the browser/version, server entry, replay details, and diagnostics. Other yakuman and live matches are not fully validated. |
+
+Diagnostics are available through the browser extension manager's **Options** / **Extension options** entry; viewing them does not reconnect the debugger. Do not post credentials, authentication tokens, or browser profiles in issues.
+
+## How it works
+
+The inspected WebGL client retains its native yakuman controller but disables the animation entry and skips its resource group. Yakuman FX restores those paths and corrects the flight audio channel. The controller supplies the actual completed hand; this is not video playback.
+
+The extension validates the official framework and presentation bundle, makes three length-preserving script edits locally, and redirects verified reads into Unity's temporary virtual filesystem. Original persistent cache writes remain unchanged. Unknown resources are rejected rather than patched speculatively.
+
+There is no analytics, advertising, telemetry service, or developer-operated server. Official resources are downloaded from the game's origin and processed locally. The extension does not intercept game WebSocket messages or intentionally read account credentials. This does not guarantee account safety. See [Privacy](PRIVACY.md) for permissions and data handling.
 
 ## Development
 
-End users do not need Node.js. Developers can run `npm test` with Node.js 22 or later. Tests cover LZ4 overlap and malformed data, UnityFS reconstruction, unknown-resource rejection, cache substitution, navigation scope, and restoration without automatic reload.
+Requires Node.js 22 or later for tests:
 
-## Distribution boundary
+```sh
+npm test
+```
 
-Distribute original extension code only. Do not include extracted game scripts, repacked proprietary bundles, Steam assets, account data, browser profiles, or private desktop integrations. Any required official resources should be obtained and verified locally through a documented supported process.
+Tests cover LZ4 decoding, UnityFS reconstruction, resource checks, signed-byte cache verification, navigation scope, and restoration. Automated checks do not replace animation and audio playback testing.
 
-## Limitations
+## License
 
-This is an unofficial presentation modification. It does not guarantee protection from account sanctions. Claims about gameplay messages, data collection, permissions, and restoration must be verified against the finished extension before release.
+Original project code is licensed under [GPL-3.0-only](LICENSE). When distributing modified versions, follow the GPL's source and license requirements. The license does not grant rights to Mahjong Soul's proprietary code or assets, which belong to their respective owners.
 
-Mahjong Soul and its assets belong to their respective owners. This project is not affiliated with or endorsed by them. A source-code license has not yet been selected.
-
-
-
-
-
-
+Only the public browser extension is distributed here. Private desktop integrations, extracted game scripts, repacked bundles, Steam assets, and account data are excluded.

@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Browser-local native yakuman animation restoration for Mahjong Soul.",
-  "scripts": { "test": "node --test tests/*.test.js" },
-  "engines": { "node": ">=22" }
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "GPL-3.0-only"
 }
