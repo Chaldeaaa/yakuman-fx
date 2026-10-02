@@ -16,7 +16,8 @@ export function filesystemHook(base64, basename, expectedSize, expectedCrc32, pr
             if(!source||node.usedBytes!==${expectedSize}){window.__yakumanNative.failure={reason:'cache-size',actual:node.usedBytes,expected:${expectedSize}};return originalOpen.call(FS,path,flags,mode);}
             var crc=0xffffffff;
             for(var index=0;index<node.usedBytes;index++){
-              crc^=source[index];
+              // Some Unity builds expose MEMFS contents as signed Int8Array.
+              crc^=source[index]&255;
               for(var bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);
             }
             if(((crc^0xffffffff)>>>0)!==${expectedCrc32}){window.__yakumanNative.failure={reason:'cache-checksum',actual:(crc^0xffffffff)>>>0};return originalOpen.call(FS,path,flags,mode);}

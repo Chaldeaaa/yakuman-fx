@@ -4,7 +4,7 @@ Native yakuman animations for Mahjong Soul in your browser.
 
 ## Status
 
-Version 0.2.2 is an unpacked browser-extension prototype with navigation-safe attachment and runtime diagnostics. An isolated headless Edge test confirmed extension loading, automatic attachment, four verified resource reads, Unity initialization, and restoration after reload. Native replay animation and audio still need visual/audible confirmation in an ordinary browser. Chrome Web Store / Microsoft Edge Add-ons approval has not been obtained.
+Version 0.2.3 is an unpacked browser-extension prototype with navigation-safe attachment and runtime diagnostics. An isolated headless Edge test confirmed extension loading, automatic attachment, four verified resource reads, Unity initialization, and restoration after reload. Native replay animation and audio still need visual/audible confirmation in an ordinary browser. Chrome Web Store / Microsoft Edge Add-ons approval has not been obtained.
 
 A private WebView2 prototype demonstrated native flying-tile animation in a Suuankou replay. Its flight audio was corrected and confirmed during replay playback. The live-match animation entry has been enabled in that prototype, but live-match playback and other yakuman remain untested. The private integration is not distributed in this repository.
 
@@ -53,5 +53,6 @@ Distribute original extension code only. Do not include extracted game scripts, 
 This is an unofficial presentation modification. It does not guarantee protection from account sanctions. Claims about gameplay messages, data collection, permissions, and restoration must be verified against the finished extension before release.
 
 Mahjong Soul and its assets belong to their respective owners. This project is not affiliated with or endorsed by them. A source-code license has not yet been selected.
+
 
 
