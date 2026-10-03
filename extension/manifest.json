@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Yakuman FX",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Restore native yakuman animations on supported Mahjong Soul builds.",
   "minimum_chrome_version": "118",
   "permissions": [
