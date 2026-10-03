@@ -62,7 +62,7 @@ Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. L
 
 **Download → Extract → Load unpacked → Enable in the lobby**
 
-1. Download and extract `yakuman-fx-v0.3.0.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
+1. Download and extract `yakuman-fx-v0.3.1.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
 2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the folder containing `manifest.json`.
 4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.

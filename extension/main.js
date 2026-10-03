@@ -33,7 +33,9 @@
     if (event.data?.type === 'yakuman-stream-config' && !settled) {
       clearTimeout(timeout); settle(event.data.config);
     }
-    if (event.data?.type === 'yakuman-stream-disable') { disabled = true; stop?.(); }
+    if (event.data?.type === 'yakuman-stream-disable') {
+      disabled = true; clearTimeout(timeout); settle({enabled: false}); stop?.(); emit();
+    }
   });
   const descriptor = Object.getOwnPropertyDescriptor(window, 'unityFramework');
   if (descriptor && !descriptor.configurable) {
@@ -63,7 +65,7 @@
             return {...core, bytes};
           }));
         } catch (error) {
-          report.failure = {reason: error.message}; emit();
+          disabled = true; report.failure = {reason: error.message}; stop?.(); emit();
           return Reflect.apply(target, receiver, args);
         }
         let installed = false;
@@ -71,7 +73,7 @@
           if (installed || disabled) return;
           installed = true;
           try { stop = hook.install(args[0], variants, report, emit); }
-          catch (error) { report.failure = {reason: error.message}; }
+          catch (error) { disabled = true; report.failure = {reason: error.message}; stop?.(); }
           emit();
         };
         args[0].preRun.push(install);

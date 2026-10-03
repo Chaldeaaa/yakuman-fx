@@ -3,6 +3,7 @@ import {createResourceCache} from './resource-cache.js';
 import {clientForUrl} from './clients.js';
 const prepare = createResourceCache({storage: chrome.storage.local});
 const lastReports = new Map();
+const failedTabs = new Set();
 async function status(tabId, state, message) {
   await chrome.storage.session.set({['tab:' + tabId]: {state, message}});
   await chrome.action.setBadgeText({tabId, text: state === 'enabled' ? 'ON' : state === 'error' ? '!' : ''});
@@ -14,7 +15,12 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
       const client = clientForUrl(sender.url);
       if (!client || sender.tab?.id === undefined || sender.frameId !== 0) throw Error('Unsupported sender');
       if (message.action === 'prepare') {
-        if (!(await chrome.storage.local.get('enabled')).enabled) return {ok: true, config: {enabled: false}};
+        lastReports.delete(sender.tab.id);
+        failedTabs.delete(sender.tab.id);
+        if (!(await chrome.storage.local.get('enabled')).enabled) {
+          await status(sender.tab.id, 'off', 'Automatic effects are disabled.');
+          return {ok: true, config: {enabled: false}};
+        }
         await status(sender.tab.id, 'attached', 'Preparing verified native effects.');
         const profile = globalThis.YakumanProfiles.find(item => item.entry === client.entry);
         const variants = await Promise.all(client.cores.map((core, index) => prepare(core, profile.cores[index].patchHash)));
@@ -25,6 +31,8 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
       const report = {transport: 'module-stream', installed: input.installed === true, runtimeReady: input.runtimeReady === true,
         bundleReads: Number.isSafeInteger(input.bundleReads) ? Math.max(0, Math.min(input.bundleReads, 100000)) : 0,
         failure: typeof input.failure === 'string' ? input.failure.slice(0, 100) : null};
+      if (failedTabs.has(sender.tab.id)) return {ok: true};
+      if (report.failure) failedTabs.add(sender.tab.id);
       const key = JSON.stringify(report);
       if (lastReports.get(sender.tab.id) === key) return {ok: true};
       lastReports.set(sender.tab.id, key);
@@ -40,11 +48,15 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
     if (!clientForUrl(tab.url)) throw Error('Open a supported Mahjong Soul game page to use Yakuman FX.');
     if (message.action === 'enable') {
       await chrome.storage.local.set({enabled: true});
+      lastReports.delete(tab.id);
+      await status(tab.id, 'pending', 'Ready for the next game load. Reload only in the lobby.');
       await chrome.tabs.reload(tab.id, {bypassCache: true});
     } else if (message.action === 'restore') {
       await chrome.storage.local.set({enabled: false});
       await status(tab.id, 'disabled', 'Automatic effects disabled. Reload in the lobby to remove the current temporary patch.');
     } else if (message.action === 'reload') {
+      lastReports.delete(tab.id);
+      await status(tab.id, 'pending', 'Ready for the next game load. Reload only in the lobby.');
       await chrome.tabs.reload(tab.id, {bypassCache: true});
     } else throw Error('Unknown action');
     return {ok: true};
@@ -53,5 +65,6 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
 });
 chrome.tabs.onRemoved.addListener(tabId => {
   lastReports.delete(tabId);
+  failedTabs.delete(tabId);
   void chrome.storage.session.remove(['tab:' + tabId, 'diagnostics:' + tabId]);
 });

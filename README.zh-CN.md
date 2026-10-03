@@ -61,7 +61,7 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 **下载 → 解压 → 加载扩展 → 大厅启用**
 
-1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.3.0.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
+1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.3.1.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
 2. 打开 `edge://extensions` 或 `chrome://extensions`，开启 **开发者模式**。
 3. 点击 **加载解压缩的扩展**，选择包含 `manifest.json` 的文件夹。
 4. 打开支持的雀魂入口，停留在大厅，点击扩展内的 **Enable & Reload**。

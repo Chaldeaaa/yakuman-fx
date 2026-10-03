@@ -6,7 +6,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 FILES = (
     'manifest.json background.js bundle.js clients.js profiles.js resource-cache.js '
-    'stream-hook.js main.js bridge.js popup.html popup.css popup.js dropdown.js '
+    'stream-hook.js main.js bridge.js popup.html popup.css popup.js status.js updates.js dropdown.js '
     'i18n.js theme.js troubleshooting.html troubleshooting.js LICENSE NOTICE '
     'icons/icon-16.png icons/icon-32.png icons/icon-48.png icons/icon-128.png'
 ).split()

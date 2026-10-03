@@ -2,6 +2,8 @@
 
 Yakuman FX has no analytics, advertising, telemetry service, or developer-operated server.
 
+Clicking Check for updates sends a credential-free request to GitHub's public releases API. It does not send game data or diagnostics. GitHub receives ordinary connection metadata. No update check runs during game startup, and updates are downloaded and installed by the user.
+
 The extension requests pinned official presentation resources from the selected region's official resource origin (`game.maj-soul.com` or `appstatic.mahjongsoul.com`) without credentials. These requests go to the game operator and remain subject to its network logging and policies.
 
 Local extension storage holds enable, appearance and language preferences, together with verified presentation-resource replacements. Cached replacements are checked before reuse and avoid repeating downloads and reconstruction on subsequent launches. They remain in the browser and are removed when the extension is uninstalled. Session storage holds per-tab status and a limited startup diagnostic summary.
