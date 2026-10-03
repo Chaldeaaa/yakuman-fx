@@ -4,11 +4,11 @@ Yakuman FX is distributed through source downloads and manually installed extens
 
 ## Release contents
 
-The installable ZIP contains the `extension/` directory's contents at the ZIP root, including `manifest.json`, original extension scripts, PNG icons, LICENSE, and NOTICE. End users do not need development runtimes or private launchers.
+The installable ZIP contains the `extension/` directory's contents at the ZIP root, including `manifest.json`, original extension scripts, PNG icons, LICENSE, and NOTICE.
 
 Keep the matching source revision available in this repository with each release, in accordance with GPL-3.0-only. The source archive is separate from the installable extension asset. No automatic updater is included.
 
-Only original public project files may be published. Exclude extracted game scripts, proprietary bundles, Steam assets, credentials, browser profiles, research exports, and private desktop integrations. Required game resources are fetched from official origins and verified locally at runtime.
+Required game resources are fetched from official origins and verified locally at runtime.
 
 ## Public release checklist
 

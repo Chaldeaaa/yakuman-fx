@@ -29,5 +29,5 @@ The regional cores are obtained from the official CDN under `/v4/jp/resources/ab
 
 Independent Unity parsing confirmed that each regional replacement changes only Tools.lua, LoadMgr.lua, and AudioMgr.lua: three changed TextAssets out of 68, with all original script lengths preserved. Browser runtime validation and actual animation/audio playback are separate checks.
 
-Only public resource identifiers are listed here; game assets are not distributed by this project. Live matches and broader yakuman coverage remain unvalidated.
+Live matches and broader yakuman coverage remain unvalidated.
 
