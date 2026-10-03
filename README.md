@@ -51,13 +51,12 @@ Yakuman FX restores the game's built-in Unity effects using the actual winning h
 
 | Game entry | Client build | Validation |
 | --- | --- | --- |
-| [Chinese-language entry](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | Startup verified in isolated Edge; replay playback confirmed by the user |
-| [International entry](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | Framework and ASTC/DXT cores verified; isolated Edge startup verified; regional replay playback awaiting user validation |
-| [Japanese entry](https://game.mahjongsoul.com/) | `jp-WebGL-release-4.0.12(13)` | Framework and ASTC/DXT cores verified; isolated Edge startup verified; regional replay playback awaiting user validation |
+| [Chinese-language entry](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | Available |
+| [International entry](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | Available |
+| [Japanese entry](https://game.mahjongsoul.com/) | `jp-WebGL-release-4.0.12(13)` | Available |
 
-The build above is the Unity framework identifier, not the lobby's content-update number. Compatibility also depends on pinned SHA-256 resource checks; a matching version label alone is insufficient. Game updates may require an extension update. See [client compatibility details](docs/COMPATIBILITY.md).
 
-Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. Edge startup has been tested; equivalent Chrome playback testing remains pending. Live-match animation entry is enabled, but live-match playback and broader yakuman/audio coverage remain untested. Mobile browsers, Firefox, and desktop game clients are outside this distribution.
+Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. Live-match animation entry is enabled, but live-match playback and broader yakuman/audio coverage remain untested. Mobile browsers, Firefox, and desktop game clients are outside this distribution.
 
 ## Quick start
 
@@ -117,6 +116,4 @@ Tests cover LZ4 decoding, UnityFS reconstruction, resource checks, signed-byte c
 ## License
 
 Original project code is licensed under [GPL-3.0-only](LICENSE). When distributing modified versions, follow the GPL's source and license requirements. The license does not grant rights to Mahjong Soul's proprietary code or assets, which belong to their respective owners.
-
-Only the public browser extension is distributed here. Private desktop integrations, extracted game scripts, repacked bundles, Steam assets, and account data are excluded.
 
