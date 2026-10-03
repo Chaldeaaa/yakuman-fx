@@ -8,7 +8,7 @@
 <p align="center"><b>Bring native yakuman animations to Mahjong Soul in your browser.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.3.0-fa8072?style=flat-square" alt="Version 0.3.0"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.3.1-fa8072?style=flat-square" alt="Version 0.3.1"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome and Edge desktop">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="Preview">
@@ -38,12 +38,17 @@ Yakuman FX restores the game's built-in Unity effects using the actual winning h
 
 ## Features
 
-| Native effects | Install once | Easy to control |
-| :---: | :---: | :---: |
-| Flying tiles and yakuman animations driven by the real completed hand. | Activate from the lobby once; future game loads enable automatically. | Restore Default disables activation; Settings offers Light, Dark, or System themes. |
+| Feature | What it does |
+| --- | --- |
+| Native animations | Flying tiles and yakuman effects driven by the actual winning hand, with native audio. |
+| Automatic activation | Enable once in the lobby; your preference is saved for future game loads. |
+| Clear status and recovery | Distinguishes enabled, loading, ready, and error states, with a next step when needed. |
+| Update checks | Check GitHub releases from Settings and follow the manual update instructions. |
+| Language and appearance | English / Simplified Chinese interface and Light / Dark / System themes. |
+| Local resource caching | Reuses verified resources on later launches to reduce repeated downloads. |
 
 > [!NOTE]
-> Official resources are verified locally. Unknown client builds are left unpatched.
+> Resources are verified before use. Unknown builds are left unpatched, and a verification failure stops further substitutions for that page load. These safeguards do not guarantee account safety.
 
 ---
 
@@ -62,11 +67,11 @@ Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. L
 
 **Download → Extract → Load unpacked → Enable in the lobby**
 
-1. Download and extract `yakuman-fx-v0.3.1.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
+1. Download and extract `yakuman-fx-v0.3.1.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases).
 2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the folder containing `manifest.json`.
 4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.
-5. Confirm the lobby reminder and wait for **Native effects loaded.**
+5. Confirm the lobby reminder and wait for **Native effects ready**
 
 > [!IMPORTANT]
 > Keep the extracted folder in place. **Never reload during a live match.**
@@ -81,17 +86,20 @@ See the step-by-step [installation guide](docs/INSTALL.md) for folder selection,
 
 **Disable:** Click **Restore Default**, then reload in the lobby to remove the patch already loaded into the page. To uninstall, remove the extension in the browser's extension manager and reload the game.
 
-**Update:** Close the game, replace the extension files in the same installed folder with the new release, click the extension's **Reload** button in the browser extension manager, then reopen the game. Updates are manual.
+**Update:** Open **Settings → Check for updates**. If an update is available, follow the release link and download the extension ZIP. Close the game, extract the new files into the same installed folder, click **Reload** in the browser extension manager, then reopen the game. Updates are installed manually; checking only runs when you click the button.
 
 ## Troubleshooting
 
-| Symptom | What to do |
+| Status or symptom | What to do |
 | --- | --- |
-| “Waiting for verified resource reads.” stays visible | Installation alone does not confirm activation. Inspect saved diagnostics in **Extension options** and retry from the lobby. |
-| Resource checksum or unsupported-framework error | The client/cache may differ from the pinned build. Leave it unpatched and check for an extension update. Include saved diagnostics in a bug report. |
-| No animation despite successful loading | Report the browser/version, server entry, replay details, and diagnostics. Other yakuman and live matches are not fully validated. |
+| Enabled for future launches | Return to the lobby and reload to apply the saved setting. |
+| Loading native effects | Wait for the game to finish loading. If the status persists after reaching the lobby, reload once. |
+| Resources could not load | Check your connection and retry from the lobby. |
+| Game resources do not match | Check for updates in Settings. If already up to date, include startup diagnostics in an issue report. |
+| Native effects ready, but no animation | Report the browser and extension versions, game entry, replay details, and startup diagnostics. |
+| Update check fails | Retry after checking your connection, or use the **Open releases** link in Settings. |
 
-Diagnostics are available through the browser extension manager's **Options** / **Extension options** entry. Do not post credentials, authentication tokens, or browser profiles in issues.
+Open the popup's gear button, then expand **Troubleshooting** in Settings to view saved startup diagnostics. Do not post credentials, authentication tokens, or browser profiles in issues.
 
 ## How it works
 
@@ -99,7 +107,7 @@ The inspected WebGL client retains its native yakuman controller but disables th
 
 The extension validates the official framework and presentation bundle, makes three length-preserving script edits locally, and redirects verified reads into Unity's temporary virtual filesystem. Original persistent cache writes remain unchanged. Unknown resources are rejected rather than patched speculatively.
 
-There is no analytics, advertising, telemetry service, or developer-operated server. Official resources are downloaded from the game's origin or official resource CDN and processed locally. The extension does not intercept game WebSocket messages or intentionally read account credentials. This does not guarantee account safety. See [Privacy](PRIVACY.md) for permissions and data handling.
+There is no analytics, advertising, telemetry service, or developer-operated server. Official resources are downloaded from the game's origin or official resource CDN and processed locally. The extension does not intercept game WebSocket messages or intentionally read account credentials. Checking for updates contacts GitHub only when requested. This does not guarantee account safety. See [Privacy](PRIVACY.md) for permissions and data handling.
 
 ## Development
 
@@ -109,7 +117,15 @@ Requires Node.js 22 or later for tests:
 npm test
 ```
 
-Tests cover LZ4 decoding, UnityFS reconstruction, resource checks, signed-byte cache verification, navigation scope, and restoration. Automated checks do not replace animation and audio playback testing.
+Tests cover resource processing and caching, patch boundaries, failure handling, message coalescing, bilingual recovery states, and release version comparison. Automated checks do not replace animation and audio playback testing.
+
+Build the extension ZIP with Python 3:
+
+```sh
+python scripts/package.py
+```
+
+The package is written to `dist/`. GitHub Actions runs tests and builds versioned releases automatically. See [Distribution](DISTRIBUTION.md) for the release workflow and [Roadmap](ROADMAP.md) for planned work.
 
 ## License
 
