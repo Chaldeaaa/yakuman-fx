@@ -27,6 +27,7 @@ def build():
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for name in sorted(FILES):
             entry = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
+            entry.create_system = 3
             entry.compress_type = zipfile.ZIP_DEFLATED
             entry.external_attr = 0o644 << 16
             data = (ROOT / 'extension' / name).read_bytes()
