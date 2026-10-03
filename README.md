@@ -28,6 +28,7 @@ Yakuman FX restores the game's built-in Unity effects using the actual winning h
 ## Contents
 
 - [Features](#features)
+- [Safety and scope](#safety-and-scope)
 - [Compatibility](#compatibility)
 - [Quick start](#quick-start)
 - [Disable and update](#disable-and-update)
@@ -51,6 +52,25 @@ Yakuman FX restores the game's built-in Unity effects using the actual winning h
 > Resources are verified before use. Unknown builds are left unpatched, and a verification failure stops further substitutions for that page load. These safeguards do not guarantee account safety.
 
 ---
+
+## Safety and scope
+
+Yakuman FX focuses on the local presentation of native yakuman animations. Compared with tools that rewrite character, inventory, or cosmetic data to display unowned skins, this project has a narrower modification scope and does not change ownership information.
+
+| Comparison | Yakuman FX | Skin unlockers that rewrite account data |
+| --- | --- | --- |
+| Modification target | Yakuman animation availability, resource loading, and audio logic | Character, skin, or cosmetic data received by the client |
+| Game communication | Does not intercept or rewrite game WebSocket messages | Typically intercepts or rewrites related messages |
+| Account entitlements | Does not change character, inventory, or cosmetic ownership information | Displays local content that differs from actual ownership |
+| Gameplay decisions | Provides no move recommendations or automated actions | Depends on the tool and is outside this comparison |
+
+### How it works and safeguards
+
+The extension uses the game's existing yakuman controller, with the actual winning hand supplied by the game. It makes three targeted changes within verified resources: animation availability, effect-resource loading, and audio handling.
+
+Substitution applies only to matching read-only file descriptors. Original persistent cache contents and write paths remain unchanged. The extension verifies framework and resource fingerprints; unknown builds or verification failures stop further substitutions for that page load instead of attempting an unsupported patch.
+
+These choices limit interaction with account data, game communication, and unrelated logic, helping reduce unintended changes and compatibility problems. **Technical safeguards are not official authorization and do not establish a lower ban rate.** Yakuman FX remains an unofficial client modification that may result in account restrictions or bans. No account-safety guarantee is provided.
 
 ## Compatibility
 
