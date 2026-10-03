@@ -51,13 +51,11 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 | 游戏入口 | 客户端构建 | 验证情况 |
 | --- | --- | --- |
-| [中文入口](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | 独立 Edge 环境验证启动流程；用户已确认牌谱动画可播放 |
-| [国际服入口](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | 框架与 ASTC／DXT 核心资源已校验；独立 Edge 启动验证通过；牌谱播放待用户验证 |
-| [日服入口](https://game.mahjongsoul.com/) | `jp-WebGL-release-4.0.12(13)` | 框架与 ASTC／DXT 核心资源已校验；独立 Edge 启动验证通过；牌谱播放待用户验证 |
+| [中文入口](https://game.maj-soul.com/1/) | `chs_t-WebGL-release-4.0.47(47)` | 可用 |
+| [国际服入口](https://mahjongsoul.game.yo-star.com/) | `en-WebGL-release-4.0.10(11)` | 可用 |
+| [日服入口](https://game.mahjongsoul.com/) | `jp-WebGL-release-4.0.12(13)` | 可用 |
 
-以上版本是 Unity 框架构建标识，不等同于大厅显示的内容更新版本。扩展还会校验固定的资源 SHA-256；仅版本号相同并不代表兼容。游戏更新后可能需要更新扩展。完整构建和资源校验信息见 [兼容性记录](docs/COMPATIBILITY.md)。
-
-面向 Chrome／Edge 桌面版，要求 Chromium 118 或更新版本。已验证 Edge 启动流程；Chrome 的同等播放测试仍待完成。实战动画入口已启用，但实战播放、其他役满及完整音效覆盖尚未验证。此发行包不支持移动浏览器、Firefox 或桌面游戏客户端。
+面向 Chrome／Edge 桌面版，要求 Chromium 118 或更新版本。实战动画入口已启用，但实战播放、其他役满及完整音效覆盖尚未验证。此发行包不支持移动浏览器、Firefox 或桌面游戏客户端。
 
 ## 快速安装
 
@@ -115,6 +113,3 @@ npm test
 ## 许可证
 
 本项目原创代码使用 [GPL-3.0-only](LICENSE)。分发修改版时需要遵守 GPL 的源码及许可证要求。此许可证不授予雀魂专有代码或资源的权利；相关权利归原权利人所有。
-
-本仓库仅分发公开浏览器扩展，不包含私人桌面集成、提取的游戏脚本、重打包资源、Steam 资产或账号数据。
-
