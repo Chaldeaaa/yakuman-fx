@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import fs from 'node:fs';
+test('read descriptors receive shadows while writes, source nodes and rejected resources stay intact',()=>{
+  const context={Uint8Array,Uint32Array};vm.runInNewContext(fs.readFileSync(new URL('../extension/stream-hook.js',import.meta.url),'utf8'),context);
+  const api=context.YakumanStreamHook,original=new Uint8Array([0,128,255]),replacement=new Uint8Array([3,4,5,6]);
+  const table={read(){},llseek(){}};
+  const module={FS_createDataFile:()=>({mount:{type:{ops_table:{file:{stream:table}}}},stream_ops:table})};
+  const report={bundleReads:0};let notifications=0;
+  const restore=api.install(module,[{basename:'2_tsh_test',size:3,crc:api.crc32(original,3),bytes:replacement}],report,()=>notifications++);
+  const node={name:'2_tsh_test.majset',contents:new Int8Array(original.buffer),usedBytes:3,stream_ops:table};
+  const write={node,flags:577,stream_ops:table};table.open(write);assert.equal(write.node,node);assert.equal(report.bundleReads,0);
+  const read={node,flags:32768,stream_ops:table};table.open(read);assert.notEqual(read.node,node);assert.equal(read.node.usedBytes,4);assert.equal(node.usedBytes,3);assert.equal(notifications,1);
+  node.contents[0]=1;const rejected={node,flags:0};table.open(rejected);assert.equal(rejected.node,node);assert.equal(report.failure.reason,'cache-checksum');
+  const copiedOpen=table.open;restore();assert.equal(table.open,undefined);
+  node.contents[0]=0;const after={node,flags:0};copiedOpen(after);assert.equal(after.node,node);
+});

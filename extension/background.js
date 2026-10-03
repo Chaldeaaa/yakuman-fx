@@ -1,158 +1,57 @@
-import {buildPatch,base64,sha256} from './bundle.js';
+import './profiles.js';
+import {createResourceCache} from './resource-cache.js';
 import {clientForUrl} from './clients.js';
-import {filesystemHook} from './filesystem-hook.js';
-
-const sessions=new Map();
-const plannedDetach=new Map();
-const prepared=new Map();
-const isGame=url=>!!clientForUrl(url);
-const send=(tabId,method,params={})=>chrome.debugger.sendCommand({tabId},method,params);
-async function status(tabId,state,message){
-  await chrome.storage.session.set({['tab:'+tabId]:{state,message}});
-  await chrome.action.setBadgeText({tabId,text:state==='enabled'?'ON':state==='error'?'!':state==='attached'?'…':''}).catch(()=>{});
-  await chrome.action.setBadgeBackgroundColor({tabId,color:state==='error'?'#b84242':'#267864'}).catch(()=>{});
+const prepare = createResourceCache({storage: chrome.storage.local});
+const lastReports = new Map();
+async function status(tabId, state, message) {
+  await chrome.storage.session.set({['tab:' + tabId]: {state, message}});
+  await chrome.action.setBadgeText({tabId, text: state === 'enabled' ? 'ON' : state === 'error' ? '!' : ''});
 }
-async function patch(core){
-  if(!prepared.has(core.coreUrl))prepared.set(core.coreUrl,(async()=>{
-    const response=await fetch(core.coreUrl,{credentials:'omit',cache:'no-cache',signal:AbortSignal.timeout(20000)});
-    if(!response.ok)throw Error('Official resource download failed: '+response.status);
-    return base64(await buildPatch(new Uint8Array(await response.arrayBuffer()),core));
-  })().catch(error=>{prepared.delete(core.coreUrl);throw error;}));
-  return prepared.get(core.coreUrl);
-}
-async function attach(tabId){
-  if(sessions.has(tabId))return;
-  const current=await chrome.tabs.get(tabId);
-  if(!isGame(current.url))throw Error('Wait until the supported game page has finished navigating.');
-  if(sessions.has(tabId))return;
-  sessions.set(tabId,{ready:false});
-  let connected=false;
-  try{
-    await chrome.debugger.attach({tabId},'1.3');
-    connected=true;
-    const client=clientForUrl(current.url);
-    await send(tabId,'Fetch.enable',{patterns:[{urlPattern:client.entry+'Build/*.framework.js.gz',requestStage:'Response'}]});
-    sessions.get(tabId).ready=true;
-    await status(tabId,'attached','Ready for the next game load. Reload only in the lobby.');
-  }catch(error){
-    sessions.delete(tabId);
-    if(connected)await chrome.debugger.detach({tabId}).catch(()=>{});
-    const message=error.message.includes('chrome-extension://')?
-      'Browser refused debugger access. Another extension may have embedded a page in this tab. Reload in the lobby to retry; if it persists, use a profile without page-injecting extensions.':error.message;
-    await status(tabId,'error',message);
-    throw Error(message);
-  }
-}
-async function detach(tabId,reason='disabled'){
-  plannedDetach.set(tabId,reason);
-  sessions.delete(tabId);
-  await send(tabId,'Fetch.disable').catch(()=>{});
-  await chrome.debugger.detach({tabId}).catch(()=>{});
-}
-async function finish(tabId){
-  await detach(tabId,'loaded');
-  await status(tabId,'enabled','Native effects loaded. Debugging disconnected.');
-}
-chrome.debugger.onEvent.addListener((source,method,event)=>{
-  if(method!=='Fetch.requestPaused'||source.tabId===undefined)return;
-  void intercept(source.tabId,event);
-});
-async function intercept(tabId,event){
-  let fulfilled=false;
-  try{
-    const url=new URL(event.request.url);
-    if(event.request.method!=='GET'||event.responseStatusCode!==200)return;
-    const client=clientForUrl((await chrome.tabs.get(tabId)).url);
-    if(!client||url.origin!==new URL(client.entry).origin||url.pathname!==new URL(client.entry).pathname+'Build/'+client.frameworkName)throw Error('Unsupported client framework. No modification applied.');
-    const response=await send(tabId,'Fetch.getResponseBody',{requestId:event.requestId});
-    const source=response.base64Encoded?Uint8Array.from(atob(response.body),c=>c.charCodeAt(0)):new TextEncoder().encode(response.body);
-    if(await sha256(source)!==client.frameworkHash)throw Error('Unsupported client framework. No modification applied.');
-    const text=new TextDecoder().decode(source),anchor='Module["FS_createDataFile"]=FS.createDataFile;';
-    if(!text.includes(anchor))throw Error('Missing framework entry point.');
-    const variants=await Promise.all(client.cores.map(async core=>({base64:await patch(core),basename:new URL(core.coreUrl).pathname.split('/').pop(),size:core.coreSize,crc:core.coreCrc})));
-    if(!(await chrome.storage.local.get('enabled')).enabled)return;
-    const hook=filesystemHook(variants);
-    const body=base64(new TextEncoder().encode(text.replace(anchor,anchor+hook)));
-    await send(tabId,'Fetch.fulfillRequest',{requestId:event.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/javascript'},{name:'Cache-Control',value:'no-store'}],body});
-    fulfilled=true;
-    if(sessions.has(tabId))sessions.get(tabId).installedAt=Date.now();
-    await status(tabId,'attached','Temporary hook installed. Waiting for verified resource reads.');
-  }catch(error){await status(tabId,'error',error.message);}
-  finally{if(!fulfilled)await send(tabId,'Fetch.continueRequest',{requestId:event.requestId}).catch(()=>{});}
-}
-chrome.debugger.onDetach.addListener(source=>{
-  sessions.delete(source.tabId);
-  const reason=plannedDetach.get(source.tabId);
-  plannedDetach.delete(source.tabId);
-  if(reason==='loaded'){void status(source.tabId,'enabled','Native effects loaded. Debugging disconnected.');return;}
-  if(reason)return;
-  void status(source.tabId,'detached','Disconnected. Reload in the lobby after enabling to apply changes.');
-});
-chrome.webNavigation.onBeforeNavigate.addListener(details=>{
-  if(details.frameId!==0)return;
-  if(!isGame(details.url)){if(sessions.has(details.tabId))void detach(details.tabId);return;}
-  // The old document can be an extension's new-tab page. Never attach to it.
-});
-chrome.webNavigation.onCommitted.addListener(details=>{
-  if(details.frameId!==0||!isGame(details.url))return;
-  void chrome.storage.local.get('enabled').then(settings=>{if(settings.enabled)return attach(details.tabId);}).catch(()=>{});
-});
-chrome.tabs.onRemoved.addListener(tabId=>{sessions.delete(tabId);plannedDetach.delete(tabId);void chrome.storage.session.remove(['tab:'+tabId,'diagnostics:'+tabId]);});
-chrome.runtime.onMessage.addListener((message,sender,respond)=>{
-  if(sender.id!==chrome.runtime.id)return;
-  void(async()=>{
-    const tab=await chrome.tabs.get(message.tabId);
-    if(!isGame(tab.url))throw Error('Open the supported Mahjong Soul game page first.');
-    if(message.action==='enable'){
-      await chrome.storage.local.set({enabled:true});
-      // Attach only once the fresh game document commits. This also avoids
-      // third-party extension frames in the currently loaded document.
-      await status(tab.id,'attached','Automatic effects enabled. Reloading the game…');
-      await chrome.tabs.reload(tab.id,{bypassCache:true});
-    }else if(message.action==='restore'){
-      await chrome.storage.local.set({enabled:false});
-      for(const tabId of [...sessions.keys()])await detach(tabId);
-      await status(tab.id,'disabled','Automatic effects disabled. Reload in the lobby to remove the current temporary patch.');
-    }else if(message.action==='reload'){
-      // Retry after the new document commits, rather than attaching to old iframes.
-      await chrome.tabs.reload(tab.id,{bypassCache:true});
-    }else if(message.action==='diagnostics'){
-      const state=await chrome.storage.session.get('diagnostics:'+tab.id);
-      respond({ok:true,diagnostics:state['diagnostics:'+tab.id]||{reason:'No runtime diagnostic received. Connection may be detached.'}});
-      return;
-    }else throw Error('Unknown action');
-    respond({ok:true});
-  })().catch(error=>respond({ok:false,error:error.message}));
+chrome.runtime.onMessage.addListener((message, sender, respond) => {
+  if (sender.id !== chrome.runtime.id) return;
+  void (async () => {
+    if (message.action === 'prepare' || message.action === 'report') {
+      const client = clientForUrl(sender.url);
+      if (!client || sender.tab?.id === undefined || sender.frameId !== 0) throw Error('Unsupported sender');
+      if (message.action === 'prepare') {
+        if (!(await chrome.storage.local.get('enabled')).enabled) return {ok: true, config: {enabled: false}};
+        await status(sender.tab.id, 'attached', 'Preparing verified native effects.');
+        const profile = globalThis.YakumanProfiles.find(item => item.entry === client.entry);
+        const variants = await Promise.all(client.cores.map((core, index) => prepare(core, profile.cores[index].patchHash)));
+        return {ok: true, config: {enabled: !!(await chrome.storage.local.get('enabled')).enabled, variants}};
+      }
+      // Page reports are advisory, never authorization for a privileged operation.
+      const input = message.report || {};
+      const report = {transport: 'module-stream', installed: input.installed === true, runtimeReady: input.runtimeReady === true,
+        bundleReads: Number.isSafeInteger(input.bundleReads) ? Math.max(0, Math.min(input.bundleReads, 100000)) : 0,
+        failure: typeof input.failure === 'string' ? input.failure.slice(0, 100) : null};
+      const key = JSON.stringify(report);
+      if (lastReports.get(sender.tab.id) === key) return {ok: true};
+      lastReports.set(sender.tab.id, key);
+      await chrome.storage.session.set({['diagnostics:' + sender.tab.id]: {version: chrome.runtime.getManifest().version, hook: report}});
+      if (!(await chrome.storage.local.get('enabled')).enabled) return {ok: true};
+      await status(sender.tab.id, report.failure ? 'error' : report.bundleReads && report.runtimeReady ? 'enabled' : 'attached',
+        report.failure ? 'Resource substitution blocked: ' + report.failure : report.bundleReads && report.runtimeReady ?
+          'Native effects loaded.' : 'Waiting for verified resource reads.');
+      return {ok: true};
+    }
+    if (!sender.url?.startsWith(chrome.runtime.getURL(''))) throw Error('Unsupported sender');
+    const tab = await chrome.tabs.get(message.tabId);
+    if (!clientForUrl(tab.url)) throw Error('Open a supported Mahjong Soul game page to use Yakuman FX.');
+    if (message.action === 'enable') {
+      await chrome.storage.local.set({enabled: true});
+      await chrome.tabs.reload(tab.id, {bypassCache: true});
+    } else if (message.action === 'restore') {
+      await chrome.storage.local.set({enabled: false});
+      await status(tab.id, 'disabled', 'Automatic effects disabled. Reload in the lobby to remove the current temporary patch.');
+    } else if (message.action === 'reload') {
+      await chrome.tabs.reload(tab.id, {bypassCache: true});
+    } else throw Error('Unknown action');
+    return {ok: true};
+  })().then(respond, error => respond({ok: false, error: error.message}));
   return true;
 });
-// Chrome 118+ keeps debugger sessions alive; a periodic check reports our own hook only.
-setInterval(()=>{
-  for(const [tabId,session]of sessions)if(session.ready&&!session.checking){
-    session.checking=true;
-    void send(tabId,'Runtime.evaluate',{expression:'JSON.stringify({hook:window.__yakumanNative||null,unityReady:!!window.unityInstance?.Module?.HEAPU8})',returnByValue:true}).then(async result=>{
-    if(sessions.get(tabId)!==session)return;
-    const report=JSON.parse(result.result.value||'null');
-    const value=report?.hook;
-    void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,hook:value}});
-    if(value?.bundleReads>0&&report.unityReady)return finish(tabId);
-    if(value?.failure)return status(tabId,'error','Resource substitution blocked: '+value.failure.reason+'. See Extension options for details.');
-    if(session.installedAt&&Date.now()-session.installedAt>15000)return status(tabId,value?'attached':'error',value?'Still loading game resources. Reload only in the lobby if loading stalls.':'Hook not found in the main game context. See Extension options.');
-  }).catch(error=>{
-    void chrome.storage.session.set({['diagnostics:'+tabId]:{version:chrome.runtime.getManifest().version,reason:'runtime-query-failed',error:error.message}});
-    void status(tabId,'error','Runtime verification failed. See Extension options for the browser error.');
-  }).finally(()=>{session.checking=false;});
-  }
-},3000);
-// Recover sessions after a service-worker restart without forcing a game reload.
-void chrome.storage.local.get('enabled').then(async settings=>{
-  if(!settings.enabled)return;
-  const targets=await chrome.debugger.getTargets();
-  for(const target of targets){
-    if(target.tabId===undefined||!isGame(target.url)||!target.attached)continue;
-    try{
-      await send(target.tabId,'Runtime.evaluate',{expression:'typeof window.__yakumanNative',returnByValue:true});
-      sessions.set(target.tabId,{ready:true});
-    }catch{ /* A target attached by another debugger is not ours. */ }
-  }
-}).catch(()=>{});
-
+chrome.tabs.onRemoved.addListener(tabId => {
+  lastReports.delete(tabId);
+  void chrome.storage.session.remove(['tab:' + tabId, 'diagnostics:' + tabId]);
+});

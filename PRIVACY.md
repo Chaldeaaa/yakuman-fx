@@ -2,14 +2,12 @@
 
 Yakuman FX has no analytics, advertising, telemetry service, or developer-operated server.
 
-The extension requests the pinned official presentation bundles from the selected region's official resource origin (`game.maj-soul.com` or `appstatic.mahjongsoul.com`) without credentials, builds temporary replacements locally, and validates the game framework. These requests go to the game operator and remain subject to its network logging and policies.
+The extension requests pinned official presentation resources from the selected region's official resource origin (`game.maj-soul.com` or `appstatic.mahjongsoul.com`) without credentials. These requests go to the game operator and remain subject to its network logging and policies.
 
-Local storage holds the automatic-enable, appearance, and language preferences. Session storage holds per-tab status messages. The generated presentation bundle is kept in extension memory and then in the game's temporary virtual filesystem; it is not uploaded to a third party.
+Local extension storage holds enable, appearance and language preferences, together with verified presentation-resource replacements. Cached replacements are checked before reuse and avoid repeating downloads and reconstruction on subsequent launches. They remain in the browser and are removed when the extension is uninstalled. Session storage holds per-tab status and a limited startup diagnostic summary.
 
-Debugger access is used on supported game tabs to intercept the Unity framework response and read the extension's own diagnostic flag. The implementation does not intercept game WebSocket messages or intentionally read account credentials, hand histories, chat, or other gameplay messages.
+Packaged page scripts run on the supported Chinese, Japanese and English game entries. They verify the Unity factory fingerprint and cached resource checksum, then provide temporary replacement data for the matching read-only file descriptor. Original game-cache contents and writes remain unchanged. The extension does not intercept game WebSocket messages or intentionally read account credentials, hand histories or chat.
 
-Navigation events are checked to attach on the supported Chinese, Japanese, or English game URL and detach when leaving it. Browsing history is not saved or transmitted. The debugger permission is broad; the implementation limits its use to the supported game page. Chrome/Edge displays a debugging notice during attachment. The extension disconnects after verified loading. Saved diagnostics remain available in Extension options without reconnecting.
+The extension uses the storage permission for preferences and verified resource caching. Game-origin access is used for the page integration and official resource downloads. Browsing history is not saved or transmitted. Page diagnostic messages are treated as advisory and cannot enable the extension or initiate navigation.
 
-Restore Default disables future automatic attachment and detaches active sessions. Reload the game in the lobby to remove a patch already loaded in the page. Uninstalling the extension and reloading also removes the temporary patch.
-
-
+Restore Default disables future activation and substitutions. Reload the game in the lobby to remove animation state already loaded in the page. Uninstalling the extension and reloading also removes the temporary patch.

@@ -1,6 +1,6 @@
 # Distribution
 
-Yakuman FX is distributed through source downloads and manually installed extension ZIPs. Browser-store submission is not planned.
+Yakuman FX is distributed through source downloads and manually installed extension ZIPs.
 
 ## Release contents
 
@@ -20,3 +20,9 @@ Required game resources are fetched from official origins and verified locally a
 - Playback and audio regression check for the supported replay before a release is labeled stable.
 
 Source downloads are usable before a Release exists: extract the repository and load `extension/` using Developer mode. Keep the installed directory in place.
+
+## Automated releases
+
+Update `package.json`, `extension/manifest.json`, both README version references and `docs/releases/vVERSION.md` together. A version change merged into `main` runs the release workflow: tests, deterministic ZIP packaging, then a versioned preview release. The workflow also supports `v*` tag pushes and manual runs. Existing releases are left unchanged. A tag must match the package version.
+
+Run `npm test` and `python scripts/package.py` locally before publishing. GitHub automatically supplies the matching source archives; the workflow attaches the installable ZIP.

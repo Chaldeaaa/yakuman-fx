@@ -42,15 +42,15 @@ Keep the installed folder after loading. The browser reads the extension files f
 
 Open the [supported game entry](../README.md#compatibility) and wait until you are in the lobby. Open the Yakuman FX popup and click **Enable & Reload**. Confirm that you are in the lobby; the game reloads automatically.
 
-The browser briefly displays a debugging notice. Wait until the extension reports:
+Wait until the extension reports:
 
 ```text
-Native effects loaded. Debugging disconnected.
+Native effects loaded.
 ```
 
-The toolbar badge should show **ON**. A “Temporary hook installed” message is only an intermediate state.
+The toolbar badge should show **ON**. A “Waiting for verified resource reads.” message is only an intermediate state.
 
-The first load can take several minutes while the game downloads its resources, especially on a new regional entry. Wait for the game download to finish and the **ON** badge before testing a replay. Leave the debugging notice attached until verification completes.
+The first load can take several minutes while the game downloads its resources, especially on a new regional entry. Wait for the game download to finish and the **ON** badge before testing a replay.
 
 The preference is saved: future game loads activate automatically. Click the gear in the upper-right corner to open Settings. Choose English or 简体中文 under Language, and Light, Dark, or System under Theme. Both preferences are saved. **Never enable/reload during a live match.**
 
@@ -70,6 +70,6 @@ If the browser disables an update because it adds regional site permissions, rev
 
 ## If something goes wrong
 
-Open the extension's **Details**, then **Extension options** / **Options** in the browser extension manager to read saved diagnostics. Viewing this page does not attach a debugger. Consult the [troubleshooting table](../README.md#troubleshooting).
+Open the extension's **Details**, then **Extension options** / **Options** in the browser extension manager to read saved diagnostics. Consult the [troubleshooting table](../README.md#troubleshooting).
 
 For a report, include extension version, browser version, game entry/build, reproduction steps, and relevant saved diagnostics. Share a replay only if you are comfortable making its contents public. Never upload credentials, authentication tokens, or browser profiles.

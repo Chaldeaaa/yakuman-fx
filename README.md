@@ -8,7 +8,7 @@
 <p align="center"><b>Bring native yakuman animations to Mahjong Soul in your browser.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.12-fa8072?style=flat-square" alt="Version 0.2.12"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.3.0-fa8072?style=flat-square" alt="Version 0.3.0"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome and Edge desktop">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="Preview">
@@ -62,11 +62,11 @@ Chrome and Edge desktop are the intended browsers, with Chromium 118 or later. L
 
 **Download → Extract → Load unpacked → Enable in the lobby**
 
-1. Download and extract `yakuman-fx-v0.2.12.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
+1. Download and extract `yakuman-fx-v0.3.0.zip` from [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases). If no release is available yet, download this repository and use its `extension/` folder.
 2. Open `edge://extensions` or `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and select the folder containing `manifest.json`.
 4. Open a supported game entry, stay in the lobby, and click **Enable & Reload** in the extension popup.
-5. Confirm the lobby reminder and wait for **Native effects loaded. Debugging disconnected.**
+5. Confirm the lobby reminder and wait for **Native effects loaded.**
 
 > [!IMPORTANT]
 > Keep the extracted folder in place. **Never reload during a live match.**
@@ -87,13 +87,11 @@ See the step-by-step [installation guide](docs/INSTALL.md) for folder selection,
 
 | Symptom | What to do |
 | --- | --- |
-| Browser says the tab is being debugged | Expected during startup. The extension disconnects after verified loading. Opening DevTools or canceling the notice early may interrupt activation. |
-| “Temporary hook installed” stays visible | Installation alone does not confirm activation. Inspect saved diagnostics in **Extension options** and retry from the lobby. |
+| “Waiting for verified resource reads.” stays visible | Installation alone does not confirm activation. Inspect saved diagnostics in **Extension options** and retry from the lobby. |
 | Resource checksum or unsupported-framework error | The client/cache may differ from the pinned build. Leave it unpatched and check for an extension update. Include saved diagnostics in a bug report. |
-| “Cannot access a chrome-extension:// URL of different extension” | Another extension's frame may block attachment. Try a separate browser profile containing only Yakuman FX. |
 | No animation despite successful loading | Report the browser/version, server entry, replay details, and diagnostics. Other yakuman and live matches are not fully validated. |
 
-Diagnostics are available through the browser extension manager's **Options** / **Extension options** entry; viewing them does not reconnect the debugger. Do not post credentials, authentication tokens, or browser profiles in issues.
+Diagnostics are available through the browser extension manager's **Options** / **Extension options** entry. Do not post credentials, authentication tokens, or browser profiles in issues.
 
 ## How it works
 

@@ -1,0 +1,52 @@
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test
+        run: npm test
+      - name: Package
+        run: python3 scripts/package.py
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          tag="v$version"
+          if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "$tag" ]]; then
+            echo "Tag and package version do not match" >&2
+            exit 1
+          fi
+          notes="docs/releases/$tag.md"
+          test -f "$notes"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create "$tag" "dist/yakuman-fx-$tag.zip" \
+            --target "$GITHUB_SHA" --title "Yakuman FX $tag" \
+            --notes-file "$notes" --prerelease

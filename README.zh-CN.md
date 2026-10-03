@@ -8,7 +8,7 @@
 <p align="center"><b>在浏览器中启用雀魂原生役满动画。</b></p>
 
 <p align="center">
-  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.2.12-fa8072?style=flat-square" alt="版本 0.2.12"></a>
+  <a href="https://github.com/Chaldeaaa/yakuman-fx/releases"><img src="https://img.shields.io/badge/version-0.3.0-fa8072?style=flat-square" alt="版本 0.3.0"></a>
   <img src="https://img.shields.io/badge/browser-Chrome%20%2F%20Edge-555860?style=flat-square" alt="Chrome 与 Edge 桌面版">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-fa8072?style=flat-square" alt="GPL-3.0-only"></a>
   <img src="https://img.shields.io/badge/status-preview-555860?style=flat-square" alt="预览版">
@@ -61,11 +61,11 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 **下载 → 解压 → 加载扩展 → 大厅启用**
 
-1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.2.12.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
+1. 从 [Releases](https://github.com/Chaldeaaa/yakuman-fx/releases) 下载并解压 `yakuman-fx-v0.3.0.zip`。如果尚未发布 Release，可下载仓库源码，使用其中的 `extension/` 文件夹。
 2. 打开 `edge://extensions` 或 `chrome://extensions`，开启 **开发者模式**。
 3. 点击 **加载解压缩的扩展**，选择包含 `manifest.json` 的文件夹。
 4. 打开支持的雀魂入口，停留在大厅，点击扩展内的 **Enable & Reload**。
-5. 确认大厅提醒，等待状态显示 **Native effects loaded. Debugging disconnected.**
+5. 确认大厅提醒，等待状态显示 **Native effects loaded.**
 
 > [!IMPORTANT]
 > 保留解压后的文件夹。**不要在对局中刷新游戏。**
@@ -84,13 +84,11 @@ Yakuman FX 使用实际和牌手牌，恢复游戏内置的 Unity 役满特效�
 
 | 现象 | 处理方式 |
 | --- | --- |
-| 浏览器提示正在调试此页面 | 启动时的预期行为。验证加载完成后会自动断开；提前打开开发者工具或取消调试可能中断启用。 |
-| 一直显示 Temporary hook installed | 安装钩子并不代表验证成功。从 **扩展程序选项** 查看已保存的诊断，在大厅重试。 |
+| 一直显示 Waiting for verified resource reads. | 安装钩子并不代表验证成功。从 **扩展程序选项** 查看已保存的诊断，在大厅重试。 |
 | 资源校验失败或客户端不支持 | 客户端／缓存可能与已知构建不同。保持未修改状态，检查扩展更新；反馈时提供诊断。 |
-| Cannot access a chrome-extension:// URL of different extension | 其他扩展的页面框架可能阻止调试连接。尝试仅安装 Yakuman FX 的独立浏览器配置。 |
 | 加载成功但没有动画 | 提供浏览器及扩展版本、服务器入口、牌谱信息和诊断。实战与其他役满尚未完整验证。 |
 
-诊断入口在浏览器扩展管理页的 **选项／扩展程序选项** 中。查看诊断不会重新连接调试器。反馈时不要上传账号凭据、认证令牌或浏览器配置文件。
+诊断入口在浏览器扩展管理页的 **选项／扩展程序选项** 中。反馈时不要上传账号凭据、认证令牌或浏览器配置文件。
 
 ## 实现方式
 
